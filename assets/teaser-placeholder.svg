@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
-  <rect width="100%" height="100%" fill="#edf3f5"/>
-  <rect x="48" y="48" width="1504" height="804" rx="30" fill="none" stroke="#b6c4ca" stroke-width="3" stroke-dasharray="14 14"/>
-  <text x="50%" y="47%" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="54" font-weight="700" fill="#31414b">Spectrobot teaser</text>
-  <text x="50%" y="56%" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="28" fill="#6b7982">Replace with your main figure or video</text>
-</svg>
