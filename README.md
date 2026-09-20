@@ -1,2 +1,6 @@
-# spectrobot-project.github.io
-Project website for Spectrobot - Learning tactile perception from high-bandwidth single-point sensing.
+# Spectrobot project website
+
+This repository contains the GitHub Pages website for the Spectrobot research project.
+
+Public site:
+https://spectrobot-project.github.io
