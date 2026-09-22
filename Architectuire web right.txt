@@ -1,0 +1,26 @@
+Architectuire web :
+right illustration robot holding a wave form  ---- left: 																																																																								diff chapter can be choose i top button
+SpectRobot
+Title
+Links
+# Accepted at ICRA 2027
+
+Abstract + archi pipeline fig 1 paper
+
+# Vidéo présentation of the project ?																									
+
+Results : 4 choices for the 4 boxes (little button)
+video encapsulated 3 cam : top, wrist, spectro
+
+Bench : 2 choices opendaq or teensy
+All results ( when clicking on a plot bar )
+confusion matrix + photo jaw + higlight and close up sensor
+Links dataset and model + Info daq
+
+Attention and sensitivity per task mean 
+
+Opening and work to test
+
+Contact info
+
+

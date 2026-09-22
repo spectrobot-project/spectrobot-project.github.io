@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpectRobot — Learning tactile perception from high-bandwidth single-point sensing</title>
+<meta name="description" content="SpectRobot turns single-point tactile signals into time-frequency spectrograms that standard vision encoders can consume, giving robots access to high-bandwidth touch.">
+<link rel="icon" type="image/png" href="assets/img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="topnav" id="topnav">
+  <div class="topnav-inner">
+    <a class="brand" href="#hero"><img src="assets/img/hero-full.webp" alt="SpectRobot" width="1600" height="538"></a>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="chapters" id="chapters">
+      <a href="#abstract">Abstract</a>
+      <a href="#results">Results</a>
+      <a href="#benchmark">Benchmark</a>
+      <a href="#attention">Attention</a>
+      <a href="#future">Future Work</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- HERO -->
+  <section class="hero" id="hero">
+    <div class="hero-inner">
+      <div class="hero-copy">
+        <h1>SpectRobot</h1>
+        <p class="tagline">Learning tactile perception from high-bandwidth single-point sensing</p>
+        <p class="authors">Joseph Rigal<sup>1</sup>, Emmanuel Virot<sup>1,*</sup>, Caroline Pascal<sup>2</sup></p>
+        <p class="affiliations"><sup>1</sup> Wormsensing, Seyssinet-Pariset, France · <sup>2</sup> Hugging Face, Paris, France · <sup>*</sup>Corresponding author</p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="assets/paper/spectrobot-paper.pdf" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" class="icon"><path d="M6 2h9l5 5v15a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M14 2v6h6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+            Read the Paper
+          </a>
+          <a class="btn" href="https://huggingface.co/jogarulfop" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" class="icon"><path d="M12 3v13M12 16l-4-4M12 16l4-4M5 20h14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Dataset
+          </a>
+          <a class="btn" href="https://github.com/spectrobot-project" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" class="icon"><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.7 5.4 3 5.4 3a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.4c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Code
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABSTRACT -->
+  <section class="section" id="abstract">
+    <div class="section-inner">
+      <figure class="pipeline-figure">
+        <img src="assets/img/architecture-pipeline.webp" alt="Diagram of the ACT learning pipeline fusing top camera, wrist camera and spectrogram streams through a ResNet and transformer encoder/decoder" loading="lazy">
+        <figcaption>Top camera, wrist camera and tactile spectrogram share the same ResNet + transformer pipeline.</figcaption>
+      </figure>
+
+      <h2><span class="kicker">01</span> Abstract</h2>
+      <div class="abstract-text">
+        <p>Tactile sensing is increasingly being incorporated into learning-based robotic manipulation, yet many existing approaches rely on spatially distributed sensors. Here we introduce <strong>SpectRobot</strong>, a framework that transforms single-point tactile signals into compact time-frequency spectrograms. These spectrograms encode high-bandwidth tactile histories as fixed-size image-like representations. They can be processed by standard vision encoders and integrated into learning pipelines originally developed for vision, while preserving temporal and frequency information unavailable to conventional cameras.</p>
+        <p>Rather than increasing spatial density through arrays of tactile elements, SpectRobot exploits the rich dynamics contained in sparse, high-bandwidth single-point measurements. The sensors are mounted away from the contact surface while remaining mechanically coupled to it, reducing direct exposure to wear and potentially improving robustness for long-term deployment on dexterous robots.</p>
+        <p>Our experiments demonstrate that <strong>(1)</strong> a robot can exploit single-point vibration signals to solve a visually occluded manipulation task; <strong>(2)</strong> temporal history strongly influences policy performance, while sensing bandwidth controls the spectral information available, with measurements extending to 100&nbsp;kHz; and <strong>(3)</strong> the same representation can be used across different tactile sensing technologies mediated by acceleration, force, or strain.</p>
+        <p>We further show that capabilities previously associated with research-grade instrumentation can be accessed using readily available, off-the-shelf hardware — broadening access to high-bandwidth tactile sensing for embodied learning.</p>
+      </div>
+
+      <figure class="task-figure">
+        <img src="assets/img/task-sequence.webp" alt="Three photos: robot grabbing a box, shaking it, and storing it in the correct bin" loading="lazy">
+        <figcaption>Grab, shake, and store — the robot infers hidden contents from the resulting tactile spectrogram alone.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- RESULTS: 4 boxes x 3 cams -->
+  <section class="section section-alt" id="results">
+    <div class="section-inner">
+      <h2><span class="kicker">02</span> Tactile Sorting Under Visual Occlusion</h2>
+      <p class="lede">The robot picks up an opaque box, gently shakes it, and must infer one of four visually indistinguishable contents from vision <em>and</em> the resulting tactile spectrogram before placing the box in the corresponding bin. Select a box, then play all three synchronized camera views for a representative autonomous episode.</p>
+
+      <div class="box-switch" id="boxSwitch" role="tablist" aria-label="Box content">
+        <button class="box-btn is-active" data-box="empty" role="tab" aria-selected="true">
+          <img src="assets/img/boxicons/empty.webp" alt="" loading="lazy"><span>Empty</span>
+        </button>
+        <button class="box-btn" data-box="spacer1" role="tab" aria-selected="false">
+          <img src="assets/img/boxicons/spacer1.webp" alt="" loading="lazy"><span>1 Plastic Spacer</span>
+        </button>
+        <button class="box-btn" data-box="spacer7" role="tab" aria-selected="false">
+          <img src="assets/img/boxicons/spacer7.webp" alt="" loading="lazy"><span>7 Plastic Spacers</span>
+        </button>
+        <button class="box-btn" data-box="nuts7" role="tab" aria-selected="false">
+          <img src="assets/img/boxicons/nuts7.webp" alt="" loading="lazy"><span>7 Metallic Nuts</span>
+        </button>
+      </div>
+
+      <div class="cam-box">
+        <div class="cam-box-controls">
+          <button class="play-all-btn" id="playAllBtn">
+            <svg viewBox="0 0 24 24" class="icon"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 8.5v7l6-3.5-6-3.5z" fill="currentColor"/></svg>
+            <span>Play episode</span>
+          </button>
+          <button class="restart-btn" id="restartBtn" title="Restart">
+            <svg viewBox="0 0 24 24" class="icon"><path d="M4 4v6h6M4.5 15a8 8 0 1 0 2-8.5L4 10" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="video-progress" id="sharedProgress"><div class="video-progress-buffered"></div><div class="video-progress-played"></div></div>
+        </div>
+        <div class="cam-grid-3" id="camGrid3">
+          <div class="cam-slot">
+            <h3>Top Camera</h3>
+            <div class="cam-video-frame">
+              <video preload="metadata" poster="assets/img/posters/empty_top.jpg" muted playsinline data-group="empty"><source src="assets/video/empty_top.mp4" type="video/mp4"></video>
+            </div>
+          </div>
+          <div class="cam-slot">
+            <h3>Wrist Camera</h3>
+            <div class="cam-video-frame">
+              <video preload="metadata" poster="assets/img/posters/empty_wrist.jpg" muted playsinline data-group="empty"><source src="assets/video/empty_wrist.mp4" type="video/mp4"></video>
+            </div>
+          </div>
+          <div class="cam-slot">
+            <h3>Tactile Spectrogram <span class="tag">0–10 kHz</span></h3>
+            <div class="cam-video-frame cam-video-frame-spectro">
+              <video preload="metadata" poster="assets/img/posters/empty_spectro.jpg" muted playsinline data-group="empty"><source src="assets/video/empty_spectro.mp4" type="video/mp4"></video>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="fig-note">Gripper A — IEPE Dragonfly® sensor, 0–10&nbsp;kHz, nFFT&nbsp;=&nbsp;512 (2.9&nbsp;s temporal history).</p>
+    </div>
+  </section>
+
+  <!-- BENCHMARK -->
+  <section class="section" id="benchmark">
+    <div class="section-inner">
+      <h2><span class="kicker">03</span> Sensor &amp; Acquisition Benchmark</h2>
+      <p class="lede">Seven sensing technologies — spanning acceleration, force and strain — were evaluated on three gripper designs, each instrumented on the upper jaw, away from direct contact. Choose an acquisition bench, then click a bar to highlight the sensor on its gripper and inspect its confusion matrix.</p>
+
+      <div class="bench-switch" id="benchSwitch" role="tablist" aria-label="Acquisition bench">
+        <button class="bench-btn is-active" data-bench="opendaq" role="tab" aria-selected="true">
+          <strong>High-fidelity bench</strong>
+          <span>Dewesoft IOLITE®-X · openDAQ™ · 24-bit, up to 200 kS/s</span>
+        </button>
+        <button class="bench-btn" data-bench="teensy" role="tab" aria-selected="false">
+          <strong>Low-cost bench</strong>
+          <span>Teensy 4.1 · ADS8688 · ≈100 € total cost</span>
+        </button>
+      </div>
+
+      <div class="bench-links" id="benchLinks">
+        <a id="datasetLink" href="#" target="_blank" rel="noopener">Dataset ↗</a>
+        <a id="modelLink" href="#" target="_blank" rel="noopener">Model ↗</a>
+      </div>
+
+      <div class="chart-wrap">
+        <div class="chart-legend-row">
+          <div class="chart-legend" id="chartLegend"></div>
+          <button class="link-btn" id="openFig2">View full published figure (Fig. 2) ↗</button>
+        </div>
+        <div class="bar-chart" id="barChart" aria-hidden="false"></div>
+      </div>
+
+      <div class="detail-panel" id="detailPanel"></div>
+    </div>
+  </section>
+
+  <!-- ATTENTION -->
+  <section class="section section-alt" id="attention">
+    <div class="section-inner">
+      <h2><span class="kicker">04</span> Attention &amp; Scene-Sensitivity Analysis</h2>
+      <p class="lede">Trained ACT models were analyzed with <strong>Emboviz</strong>, a LeRobot visualization framework, using two diagnostics: <strong>attention</strong> (internal weights during the forward pass) and <strong>scene sensitivity</strong> (how the output changes when regions of the input are occluded). Maps are averaged over time and across successful episodes, per box class.</p>
+
+      <img class="attn-demo" src="assets/img/attention/demo-photos.webp" alt="Robot shaking a box over the sorting bins with an attention heatmap overlaid on the tactile spectrogram" loading="lazy">
+
+      <div class="attn-controls">
+        <div class="attn-tabs" id="attnBoxTabs" role="tablist" aria-label="Box class">
+          <button class="is-active" data-abox="empty">Empty</button>
+          <button data-abox="spacer1">1 Spacer</button>
+          <button data-abox="spacer7">7 Spacers</button>
+          <button data-abox="nuts7">7 Nuts</button>
+        </div>
+        <div class="attn-bandwidth" id="attnBandwidth" role="tablist" aria-label="Bandwidth">
+          <button class="is-active" data-aband="10khz">0–10 kHz</button>
+          <button data-aband="100khz">0–100 kHz</button>
+        </div>
+      </div>
+
+      <figure class="attn-figure">
+        <img id="attnImage" src="assets/img/attention/empty-10khz.webp" alt="Attention and scene-sensitivity maps for the empty box, 0-10 kHz" loading="lazy">
+      </figure>
+      <p class="fig-note">Left: mean attention. Right: mean scene sensitivity. Dashed lines mark the crop window used to build the spectrogram fed to the policy.</p>
+    </div>
+  </section>
+
+  <!-- FUTURE WORK -->
+  <section class="section" id="future">
+    <div class="section-inner">
+      <h2><span class="kicker">05</span> Open Questions &amp; Future Work</h2>
+      <div class="future-grid">
+        <article class="future-card">
+          <h3>Combining static &amp; dynamic touch</h3>
+          <p>Piezoelectric sensors excel at transients but miss static loading. Pairing them with lower-frequency force estimates (e.g. actuator currents) could give a more complete picture of contact.</p>
+        </article>
+        <article class="future-card">
+          <h3>Spatial tactile arrays</h3>
+          <p>Several vibration sensors distributed over the structure could be encoded as additional image channels alongside RGB/depth — bridging high-bandwidth sensing with spatial localization.</p>
+        </article>
+        <article class="future-card">
+          <h3>Beyond ACT: VLA &amp; world-action models</h3>
+          <p>Because tactile signals become images before entering the policy, SpectRobot should be largely agnostic to the downstream architecture, as long as it has an image-encoding stage.</p>
+        </article>
+        <article class="future-card">
+          <h3>Sim-to-real contact models</h3>
+          <p>Learned representations could reveal which aspects of contact dynamics — friction, impacts, deformation — are worth retaining in future physics models.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="section section-alt" id="contact">
+    <div class="section-inner">
+      <h2><span class="kicker">06</span> Contact</h2>
+      <p class="lede">Questions about the paper, the dataset, or reproducing the bench? Reach out.</p>
+      <div class="contact-row">
+        <a class="btn" href="mailto:emmanuel.virot@wormsensing.com">
+          <svg viewBox="0 0 24 24" class="icon"><path d="M3 6h18v12H3z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3 7l9 6 9-6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+          emmanuel.virot@wormsensing.com
+        </a>
+        <a class="btn" href="mailto:josephrigalp@gmail.com">
+          <svg viewBox="0 0 24 24" class="icon"><path d="M3 6h18v12H3z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3 7l9 6 9-6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+          josephrigalp@gmail.com
+        </a>
+        <a class="btn" href="https://github.com/spectrobot-project" target="_blank" rel="noopener">GitHub Organization ↗</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="section-inner">
+    <p>SpectRobot — site built from the project figures, benchmark data and dataset clips.</p>
+  </div>
+</footer>
+
+<div class="lightbox" id="lightbox" hidden>
+  <button class="lightbox-close" id="lightboxClose" aria-label="Close">✕</button>
+  <img id="lightboxImg" src="" alt="">
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
