@@ -327,6 +327,9 @@
       errBar.className = 'error-bar';
       errBar.style.bottom = `${lower * BAR_SCALE_PX}px`;
       errBar.style.height = `${(upper - lower) * BAR_SCALE_PX}px`;
+      const errDot = document.createElement('span');
+      errDot.className = 'error-bar-dot';
+      errBar.appendChild(errDot);
       outer.appendChild(errBar);
 
       const valueLbl = document.createElement('span');
