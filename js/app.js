@@ -31,7 +31,6 @@
   const boxSwitch = document.getElementById('boxSwitch');
   const camGrid3 = document.getElementById('camGrid3');
   const playAllBtn = document.getElementById('playAllBtn');
-  const restartBtn = document.getElementById('restartBtn');
 
   const VIDEO_SETS = {
     empty: { top: 'empty_top', wrist: 'empty_wrist', spectro: 'empty_spectro', gripper: 'Gripper A' },
@@ -118,12 +117,6 @@
       playAllBtn.querySelector('span').textContent = 'Play episode';
     }
   });
-  restartBtn?.addEventListener('click', () => {
-    const vids = allVideos();
-    vids.forEach(v => { v.currentTime = 0; v.play().catch(() => {}); });
-    playAllBtn.classList.add('is-playing');
-    playAllBtn.querySelector('span').textContent = 'Pause episode';
-  });
   camGrid3?.addEventListener('ended', e => {
     if (e.target.tagName !== 'VIDEO') return;
     if (allVideos().every(v => v.paused || v.ended)) {
@@ -140,41 +133,42 @@
   const GRIPPERS = {
     a: {
       label: 'Gripper A',
-      desc: 'Reference gripper carrying an IEPE Dragonfly® strain sensor and an IEPE accelerometer, mounted on the upper jaw, mechanically coupled to but physically separated from the contact points.',
+      desc: 'First gripper carrying an IEPE Dragonfly® strain sensor and an IEPE accelerometer, mounted on the upper jaw, high-end sensors to test the performance of the spectrobot pipeline.',
       sensors: [
-        { id: 'dgf-acc', name: 'IEPE Dragonfly®', abbr: 'dgf', seg: [19, 9, 18, 16], gf: 8, note: 'Common reference sensor bonded to every gripper design to monitor dataset-level consistency.' },
-        { id: 'acc', name: 'IEPE Accelerometer', abbr: 'acc', seg: [17, 19, 9, 12], gf: 6 },
-        { id: 'notact', name: 'No Tactile Sensor', abbr: 'none', seg: [1, 4, 8, 6], gf: 9, note: 'Vision-only baseline — close to the 25% chance level for 4 classes.' },
+        { id: 'dgf-acc', name: 'IEPE Dragonfly®', abbr: 'dgf', seg: [19, 9, 18, 16], gf: 8, note: 'Industrial grade reference sensor bonded to every gripper design to monitor dataset-level consistency.' },
+        { id: 'acc', name: 'IEPE Accelerometer', abbr: 'acc', seg: [17, 19, 9, 12], gf: 6, note: 'Industrial grade piezo accelerometer.'  },
+        { id: 'notact', name: 'No Tactile Sensor', abbr: 'none', seg: [1, 4, 8, 6], gf: 9, note: 'Vision-only baseline, we removed the spectrogram of the sensors for the training and inference processes — close to 25% which is the random chance level for 4 classes.' },
       ],
     },
     b: {
       label: 'Gripper B',
       desc: 'The gripper was redesigned to place an IEPE load cell directly in the load path, measuring the resultant force transmitted through the structure.',
       sensors: [
-        { id: 'dgf-ldc', name: 'IEPE Dragonfly®', abbr: 'dgf', seg: [14, 17, 12, 14], gf: 6 },
+        { id: 'dgf-ldc', name: 'IEPE Dragonfly®', abbr: 'dgf', seg: [14, 17, 12, 14], gf: 6, note: 'Industrial grade reference sensor bonded to every gripper design to monitor dataset-level consistency.'},
         { id: 'loadcell', name: 'IEPE Load Cell', abbr: 'ldc', seg: [12, 16, 11, 0], gf: 3, note: 'Measures transmitted force rather than local contact deformation; no true static response. Includes episodes where the box could not be delivered to a bin.' },
       ],
     },
     c: {
       label: 'Gripper C',
-      desc: 'A four-sensor gripper comparing a passive (charge-output) Dragonfly®, a low-cost PZT disk, a MEMS accelerometer, and a metallic strain gauge, alongside the IEPE Dragonfly® reference.',
+      desc: 'A five-sensor gripper comparing a passive (charge-output) Dragonfly®, a low-cost PZT disk, a MEMS accelerometer, and a metallic strain gauge, alongside the IEPE Dragonfly® reference.',
       sensors: [
-        { id: 'dgf-frank', name: 'IEPE Dragonfly®', abbr: 'dgf', seg: [20, 17, 18, 9], gf: 2 },
-        { id: 'dgf-passif', name: 'Passive Dragonfly®', abbr: 'dgfp', seg: [17, 11, 16, 10], gf: 7, note: 'Outputs charge directly — no sensor-side power needed.' },
-        { id: 'pzt', name: 'PZT Disk', abbr: 'pzt', seg: [15, 16, 18, 10], gf: 2, note: 'Low-cost bulk PZT; brittle, with lead-oxide processing concerns.' },
-        { id: 'acc-mems', name: 'MEMS Accelerometer', abbr: 'mems', seg: [20, 16, 18, 12], gf: 8, note: 'Best overall — limited by a resonance around 5 kHz.' },
-        { id: 'strain-gauge', name: 'Metallic Strain Gauge', abbr: 'stg', seg: [8, 8, 15, 16], gf: 7, note: 'Captures static strain but shows broader confusion among plastic-content classes.' },
+        { id: 'dgf-frank', name: 'IEPE Dragonfly®', abbr: 'dgf', seg: [20, 17, 18, 9], gf: 2, note: 'Industrial grade reference sensor bonded to every gripper design to monitor dataset-level consistency.' },
+        { id: 'dgf-passif', name: 'Passive Dragonfly®', abbr: 'dgfp', seg: [17, 11, 16, 10], gf: 7, note: 'The passive dragonfly outputs charge directly — no sensor-side power needed.' },
+        { id: 'pzt', name: 'PZT Disk', abbr: 'pzt', seg: [15, 16, 18, 10], gf: 2, note: 'Low-cost bulk PZT; brittle, very low-cost, hight noise level.' },
+        { id: 'acc-mems', name: 'MEMS Accelerometer', abbr: 'mems', seg: [20, 16, 18, 12], gf: 8, note: 'Classical accelerometer used in IMUs — limited by a resonance around 5 kHz.' },
+        { id: 'strain-gauge', name: 'Metallic Strain Gauge', abbr: 'stg', seg: [8, 8, 15, 16], gf: 7, note: 'Captures static strain but shows broader confusion among plastic-content classes, very low signal energy output.' },
       ],
     },
   };
 
   const TEENSY = {
     label: 'Teensy 4.1 bench',
-    desc: 'A low-cost acquisition chain (≈100 €) built from a ZONRI IEPE interface converter, a 16-bit ADS8688 ADC, and a Teensy 4.1 microcontroller — roughly 10× noisier than the Dewesoft bench, evaluated on a separately collected dataset. The paper reports all three low-cost sensors at ≈90% averaged success.',
+    desc: 'A low-cost acquisition chain (≈100 €) built from a ZONRI IEPE interface converter, a 16-bit ADS8688 ADC, and a Teensy 4.1 microcontroller — roughly 10× noisier than the Dewesoft bench, evaluated on a separately collected dataset. The paper reports the three low-cost sensors at ≈82% averaged success.',
     sensors: [
-      { id: 'dgf-frank-cheap', name: 'IEPE Dragonfly®', abbr: 'dgf', seg: [19, 19, 17, 19], gf: 2, photo: sensorPhoto('dgf-frank') },
-      { id: 'pzt-cheap', name: 'PZT Disk', abbr: 'pzt', seg: [12, 18, 17, 19], gf: 1, photo: sensorPhoto('pzt') },
-      { id: 'acc-mems-cheap', name: 'MEMS Accelerometer', abbr: 'mems', seg: [20, 18, 17, 17], gf: 2, photo: sensorPhoto('acc-mems') },
+      { id: 'dgf-frank-cheap', name: 'IEPE Dragonfly®', abbr: 'dgf', seg: [18, 18, 14, 17], gf: 8, photo: sensorPhoto('dgf-frank') },
+      { id: 'pzt-cheap', name: 'PZT Disk', abbr: 'pzt', seg: [18, 20, 20, 17], gf: 4, photo: sensorPhoto('pzt') },
+      { id: 'acc-mems-cheap', name: 'MEMS Accelerometer', abbr: 'mems', seg: [18, 17, 10, 11], gf: 12, photo: sensorPhoto('acc-mems') },
+      { id: 'notact-cheap', name: 'No Tactile Sensor', abbr: 'none', seg: [5, 13, 14, 2], gf: 6, photo: sensorPhoto('notact'), note: 'Vision-only baseline for the low-cost bench — spectrogram inputs removed for training and inference.' },
     ],
   };
 
@@ -192,9 +186,10 @@
     'pzt': { dataset: 'rollout_2026-09-07_shake4it_bench_5sensors_v3_pastille_pzt_10kHz_nfft_512_20260907_131438', model: null },
     'dgf-passif': { dataset: 'rollout_2026-09-07_shake4it_bench_5sensors_v3_dgf_passif_10kHz_nfft_512_20260907_141249', model: null },
     'strain-gauge': { dataset: 'rollout_2026-09-07_shake4it_bench_5sensors_v3_strain_gauge_10kHz_nfft_512_20260907_113746', model: null },
-    'dgf-frank-cheap': { dataset: 'rollout_2026-09-10_cheap_shakeit_bench_dgf_iepe_20260910_140939', model: null },
-    'pzt-cheap': { dataset: 'rollout_2026-09-10_cheap_shakeit_bench_pzt_disk_20260910_160409', model: null },
-    'acc-mems-cheap': { dataset: 'rollout_2026-09-10_cheap_shakeit_bench_mems_acc_20260910_163759', model: null },
+    'dgf-frank-cheap': { dataset: 'rollout_2026-09-22_cheap_shakeit_bench_3sensors_v2_dgf_iepe_nfft_512_20260922_113612', model: 'policy_2026-09-21_cheap_shakeit_bench_3sensors_v2_dgf_iepe_nfft_512' },
+    'pzt-cheap': { dataset: 'rollout_2026-09-10_cheap_shakeit_bench_pzt_disk_20260910_160409', model: 'policy_2026-09-21_cheap_shakeit_bench_3sensors_v2_pzt_disk_nfft_512' },
+    'acc-mems-cheap': { dataset: 'rollout_2026-09-10_cheap_shakeit_bench_mems_acc_20260910_163759', model: 'policy_2026-09-21_cheap_shakeit_bench_3sensors_v2_acc_mems_nfft_512' },
+    'notact-cheap': { dataset: 'rollout_2026-09-21_cheap_shakeit_bench_3sensors_v2_no_tactile_20260922_173821', model: 'policy_2026-09-21_cheap_shakeit_bench_3sensors_v2_no_tactile' },
   };
   const hfDataset = repo => `https://huggingface.co/datasets/jogarulfop/${repo}`;
   const hfModel = repo => `https://huggingface.co/jogarulfop/${repo}`;
