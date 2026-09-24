@@ -329,7 +329,7 @@ h2{ font-size:1.9rem; }
 }
 .detail-block-title-row{ display:flex; align-items:center; gap:1em; margin-bottom:.5em; }
 .detail-block-title-row .detail-block-title{ margin:0; }
-.info-toggle-wrap{ position:relative; display:inline-flex; }
+.info-toggle-wrap{ position:relative; display:inline-flex; margin-left:6em; }
 .info-toggle{
   display:inline-flex; align-items:center; justify-content:center; white-space:nowrap;
   border-radius:99px; border:1px solid var(--muted); background:none; color:var(--muted);
@@ -340,7 +340,7 @@ h2{ font-size:1.9rem; }
 .info-toggle::before, .info-toggle::after{
   content:""; position:absolute; border:1px solid var(--muted); background:var(--card-bg); border-radius:50%;
 }
-.info-toggle::before{ width:6px; height:6px; left:.5em; bottom:-8px; }
+.info-toggle::before{ width:6px; height:6px; left:.6em; bottom:-8px; }
 .info-toggle::after{ width:3.5px; height:3.5px; left:.1em; bottom:-13px; }
 .info-toggle:hover, .info-toggle[aria-expanded="true"]{ border-color:var(--navy); color:var(--navy); }
 .info-toggle:hover::before, .info-toggle:hover::after,
