@@ -146,23 +146,23 @@ h2{ font-size:1.9rem; }
 .fig-note{ color:var(--muted); font-size:.85rem; margin-top:.6em; }
 
 /* ---------- ABSTRACT ---------- */
-.pipeline-figure{
-  margin:0 0 2.5em; background:var(--card-bg); border:1px solid var(--border);
+/* Figures shrink-wrap their image; the caption wraps to the image width instead of widening the box */
+.pipeline-figure, .task-figure{
+  width:fit-content; max-width:100%; margin-left:auto; margin-right:auto;
+  background:var(--card-bg); border:1px solid var(--border);
   border-radius:var(--radius); padding:1.2em; text-align:center;
 }
-.pipeline-figure img{ margin:0 auto; max-height:340px; width:auto; max-width:100%; }
-.pipeline-figure figcaption{ font-size:.9rem; color:var(--muted); margin-top:.8em; }
+.pipeline-figure{ margin-top:0; margin-bottom:2.5em; }
+.task-figure{ margin-top:2.5em; margin-bottom:0; }
+.pipeline-figure img, .task-figure img{ margin:0 auto; height:auto; max-width:100%; }
+.pipeline-figure img{ width:540px; }
+.task-figure img{ width:720px; border-radius:8px; }
+.pipeline-figure figcaption, .task-figure figcaption{
+  contain:inline-size; font-size:.9rem; color:var(--muted); margin-top:.8em;
+}
 
 .abstract-text{ max-width:56em; margin-top:1.5em; }
 .abstract-text p{ margin:0 0 1em; }
-
-.task-figure{
-  margin:2.5em 0 0; background:var(--card-bg); border:1px solid var(--border);
-  border-radius:var(--radius); padding:1.2em;
-}
-.task-figure img{ border-radius:8px; width:100%; }
-.task-figure img + img{ margin-top:1em; }
-.task-figure figcaption{ font-size:.9rem; color:var(--muted); margin-top:.9em; }
 
 /* ---------- RESULTS: box switch + cams ---------- */
 .box-switch{ display:flex; flex-wrap:wrap; gap:1em; margin:1.8em 0; }

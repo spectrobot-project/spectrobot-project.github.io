@@ -129,34 +129,34 @@
   // Per-sensor gripper photos, each with a red box pre-drawn around that specific sensor.
   const sensorPhoto = id => `assets/img/grippers/sensor-${id}.webp`;
 
-  // seg = [EMPTY, SPACER, 7_SPACERS, 7_NUTS] correct placements out of 20 each; gf = grasp/handling failures out of 80.
+  // seg, gf and confmat are filled in from js/results.js (see computeResults below).
   const GRIPPERS = {
     a: {
       label: 'Gripper A',
       desc: 'First gripper carrying an IEPE Dragonfly® strain sensor and an IEPE accelerometer, mounted on the upper jaw, high-end sensors to test the performance of the spectrobot pipeline.',
       sensors: [
-        { id: 'dgf-acc', name: 'IEPE Dragonfly®', abbr: 'dgf', seg: [19, 9, 18, 16], gf: 8, note: 'Industrial grade reference sensor bonded to every gripper design to monitor dataset-level consistency.' },
-        { id: 'acc', name: 'IEPE Accelerometer', abbr: 'acc', seg: [17, 19, 9, 12], gf: 6, note: 'Industrial grade piezo accelerometer.'  },
-        { id: 'notact', name: 'No Tactile Sensor', abbr: 'none', seg: [1, 4, 8, 6], gf: 9, note: 'Vision-only baseline, we removed the spectrogram of the sensors for the training and inference processes — close to 25% which is the random chance level for 4 classes.' },
+        { id: 'dgf-acc', name: 'IEPE Dragonfly®', abbr: 'dgf', note: 'Industrial grade reference sensor bonded to every gripper design to monitor dataset-level consistency.' },
+        { id: 'acc', name: 'IEPE Accelerometer', abbr: 'acc', note: 'Industrial grade piezo accelerometer.'  },
+        { id: 'notact', name: 'No Tactile Sensor', abbr: 'none', note: 'Vision-only baseline, we removed the spectrogram of the sensors for the training and inference processes — close to 25% which is the random chance level for 4 classes.' },
       ],
     },
     b: {
       label: 'Gripper B',
       desc: 'The gripper was redesigned to place an IEPE load cell directly in the load path, measuring the resultant force transmitted through the structure.',
       sensors: [
-        { id: 'dgf-ldc', name: 'IEPE Dragonfly®', abbr: 'dgf', seg: [14, 17, 12, 14], gf: 6, note: 'Industrial grade reference sensor bonded to every gripper design to monitor dataset-level consistency.'},
-        { id: 'loadcell', name: 'IEPE Load Cell', abbr: 'ldc', seg: [12, 16, 11, 0], gf: 3, note: 'Measures transmitted force rather than local contact deformation; no true static response. Includes episodes where the box could not be delivered to a bin.' },
+        { id: 'dgf-ldc', name: 'IEPE Dragonfly®', abbr: 'dgf', note: 'Industrial grade reference sensor bonded to every gripper design to monitor dataset-level consistency.'},
+        { id: 'loadcell', name: 'IEPE Load Cell', abbr: 'ldc', note: 'Measures transmitted force rather than local contact deformation; no true static response. Includes episodes where the box could not be delivered to a bin.' },
       ],
     },
     c: {
       label: 'Gripper C',
       desc: 'A five-sensor gripper comparing a passive (charge-output) Dragonfly®, a low-cost PZT disk, a MEMS accelerometer, and a metallic strain gauge, alongside the IEPE Dragonfly® reference.',
       sensors: [
-        { id: 'dgf-frank', name: 'IEPE Dragonfly®', abbr: 'dgf', seg: [20, 17, 18, 9], gf: 2, note: 'Industrial grade reference sensor bonded to every gripper design to monitor dataset-level consistency.' },
-        { id: 'dgf-passif', name: 'Passive Dragonfly®', abbr: 'dgfp', seg: [17, 11, 16, 10], gf: 7, note: 'The passive dragonfly outputs charge directly — no sensor-side power needed.' },
-        { id: 'pzt', name: 'PZT Disk', abbr: 'pzt', seg: [15, 16, 18, 10], gf: 2, note: 'Low-cost bulk PZT; brittle, very low-cost, hight noise level.' },
-        { id: 'acc-mems', name: 'MEMS Accelerometer', abbr: 'mems', seg: [20, 16, 18, 12], gf: 8, note: 'Classical accelerometer used in IMUs — limited by a resonance around 5 kHz.' },
-        { id: 'strain-gauge', name: 'Metallic Strain Gauge', abbr: 'stg', seg: [8, 8, 15, 16], gf: 7, note: 'Captures static strain but shows broader confusion among plastic-content classes, very low signal energy output.' },
+        { id: 'dgf-frank', name: 'IEPE Dragonfly®', abbr: 'dgf', note: 'Industrial grade reference sensor bonded to every gripper design to monitor dataset-level consistency.' },
+        { id: 'dgf-passif', name: 'Passive Dragonfly®', abbr: 'dgfp', note: 'The passive dragonfly outputs charge directly — no sensor-side power needed.' },
+        { id: 'pzt', name: 'PZT Disk', abbr: 'pzt', note: 'Low-cost bulk PZT; brittle, very low-cost, hight noise level.' },
+        { id: 'acc-mems', name: 'MEMS Accelerometer', abbr: 'mems', note: 'Classical accelerometer used in IMUs — limited by a resonance around 5 kHz.' },
+        { id: 'strain-gauge', name: 'Metallic Strain Gauge', abbr: 'stg', note: 'Captures static strain but shows broader confusion among plastic-content classes, very low signal energy output.' },
       ],
     },
   };
@@ -165,14 +165,46 @@
     label: 'Teensy 4.1 bench',
     desc: 'A low-cost acquisition chain (≈100 €) built from a ZONRI IEPE interface converter, a 16-bit ADS8688 ADC, and a Teensy 4.1 microcontroller — roughly 10× noisier than the Dewesoft bench, evaluated on a separately collected dataset. The paper reports the three low-cost sensors at ≈82% averaged success.',
     sensors: [
-      { id: 'dgf-frank-cheap', name: 'IEPE Dragonfly®', abbr: 'dgf', seg: [18, 18, 14, 17], gf: 8, photo: sensorPhoto('dgf-frank') },
-      { id: 'pzt-cheap', name: 'PZT Disk', abbr: 'pzt', seg: [18, 20, 20, 17], gf: 4, photo: sensorPhoto('pzt') },
-      { id: 'acc-mems-cheap', name: 'MEMS Accelerometer', abbr: 'mems', seg: [18, 17, 10, 11], gf: 12, photo: sensorPhoto('acc-mems') },
-      { id: 'notact-cheap', name: 'No Tactile Sensor', abbr: 'none', seg: [5, 13, 14, 2], gf: 6, photo: sensorPhoto('notact'), note: 'Vision-only baseline for the low-cost bench — spectrogram inputs removed for training and inference.' },
+      { id: 'dgf-frank-cheap', name: 'IEPE Dragonfly®', abbr: 'dgf', photo: sensorPhoto('dgf-frank') },
+      { id: 'pzt-cheap', name: 'PZT Disk', abbr: 'pzt', photo: sensorPhoto('pzt') },
+      { id: 'acc-mems-cheap', name: 'MEMS Accelerometer', abbr: 'mems', photo: sensorPhoto('acc-mems') },
+      { id: 'notact-cheap', name: 'No Tactile Sensor', abbr: 'none', photo: sensorPhoto('notact'), note: 'Vision-only baseline for the low-cost bench — spectrogram inputs removed for training and inference.' },
     ],
   };
 
-  const confmatSrc = id => `assets/img/confmat/${id}.webp`;
+  // Raw episodes (js/results.js): episodes 0-19 Empty, 20-39 1 Spacer, 40-59 7 Spacers, 60-79 7 Nuts;
+  // value = chosen bin 1-4, or 0 / -1 for a grasp/handling failure.
+  // seg = [EMPTY, SPACER, 7_SPACERS, 7_NUTS] correct placements out of 20 each; gf = grasp/handling failures out of 80;
+  // confmat[true][chosen] = placements, failures excluded.
+  function computeResults(episodes) {
+    const confmat = [0, 1, 2, 3].map(() => [0, 0, 0, 0]);
+    let gf = 0;
+    episodes.forEach((bin, i) => {
+      if (bin >= 1 && bin <= 4) confmat[Math.floor(i / 20)][bin - 1]++;
+      else gf++;
+    });
+    return { seg: confmat.map((row, i) => row[i]), gf, confmat };
+  }
+  [...Object.values(GRIPPERS).flatMap(g => g.sensors), ...TEENSY.sensors].forEach(s => {
+    Object.assign(s, computeResults(window.SPECTROBOT_RESULTS[s.id]));
+  });
+
+  // Confusion matrix drawn as an SVG data URI so it drops into the same <img> slot as a figure.
+  function confmatSrc(confmat) {
+    const cell = 164, gap = 2, pad = 20, size = pad * 2 + cell * 4 + gap * 3;
+    const lo = [200, 216, 250], hi = [30, 78, 216]; // 0 -> light blue, 20 -> --navy
+    const mix = t => `rgb(${lo.map((c, k) => Math.round(c + (hi[k] - c) * t)).join(',')})`;
+    const cells = confmat.flatMap((row, r) => row.map((v, c) => {
+      const x = pad + c * (cell + gap), y = pad + r * (cell + gap);
+      const t = Math.min(v / 20, 1);
+      return `<rect x="${x}" y="${y}" width="${cell}" height="${cell}" fill="${mix(t)}"/>` +
+        `<text x="${x + cell / 2}" y="${y + cell / 2}" dy=".35em" text-anchor="middle" font-size="54" font-weight="700" ` +
+        `font-family="Inter,system-ui,Segoe UI,Roboto,sans-serif" fill="${t > 0.55 ? '#fff' : '#10182c'}">${v}</text>`;
+    })).join('');
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">` +
+      `<rect width="${size}" height="${size}" fill="#fff"/>${cells}</svg>`;
+    return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+  }
 
   // Val (rollout) dataset and policy model repos, from table_dataset.txt — the exact HF repos behind each bar.
   const LINKS = {
@@ -392,7 +424,7 @@
               <p class="detail-confmat-caption" id="confmatCaption" hidden>Each row is the box's true contents (0 = Empty, 1 = 1 Spacer, 2 = 7 Spacers, 3 = 7 Nuts); each column is the bin the robot chose, and the diagonal is correct placements. Out of 80 episodes total, each row starts from 20 — sometimes fewer, when the box wasn't picked up or a grasp failure kept it from reaching a bin.</p>
             </span>
           </div>
-          <img id="detailConfmat" src="${confmatSrc(sensor.id)}" alt="Confusion matrix for ${sensor.name}" loading="lazy">
+          <img id="detailConfmat" src="${confmatSrc(sensor.confmat)}" alt="Confusion matrix for ${sensor.name}">
         </div>
       </div>
     `;
