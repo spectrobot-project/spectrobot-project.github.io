@@ -3,9 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SpectRobot — Learning tactile perception from high-bandwidth single-point sensing</title>
+<title>SpectRobot</title>
 <meta name="description" content="SpectRobot turns single-point tactile signals into time-frequency spectrograms that standard vision encoders can consume, giving robots access to high-bandwidth touch.">
 <link rel="icon" type="image/png" href="assets/img/favicon.png">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet">
@@ -23,9 +24,9 @@
     </button>
     <nav class="chapters" id="chapters">
       <a href="#abstract">Abstract</a>
-      <a href="#results">Results</a>
+      <!-- <a href="#results">Results</a>
       <a href="#benchmark">Benchmark</a>
-      <a href="#attention">Attention</a>
+      <a href="#attention">Attention</a> -->
       <!-- <a href="#future">Future Work</a> -->
       <a href="#contact">Contact</a>
     </nav>
@@ -65,7 +66,7 @@
     <div class="section-inner">
       <figure class="pipeline-figure">
         <img src="assets/img/architecture-pipeline.webp" alt="Diagram of the ACT learning pipeline fusing top camera, wrist camera and spectrogram streams through a ResNet and transformer encoder/decoder" loading="lazy">
-        <figcaption>Top camera, wrist camera and tactile spectrogram share the same ResNet + transformer pipeline.</figcaption>
+        <figcaption>Learning pipeline, adapted from T. Z. Zhao et al. (2023)</figcaption>
       </figure>
 
       <h2><span class="kicker">01</span> Abstract</h2>
@@ -77,12 +78,12 @@
 
       <figure class="task-figure">
         <img src="assets/img/task-sequence.webp" alt="Three photos: robot grabbing a box, shaking it, and storing it in the correct bin" loading="lazy">
-        <figcaption>Grab, shake, and store — the robot infers hidden contents from the resulting tactile spectrogram alone.</figcaption>
+        <figcaption>The robot infers hidden contents from the resulting tactile spectrogram alone.</figcaption>
       </figure>
     </div>
   </section>
 
-  <!-- RESULTS: 4 boxes x 3 cams -->
+  <!-- RESULTS: 4 boxes x 3 cams
   <section class="section section-alt" id="results">
     <div class="section-inner">
       <h2><span class="kicker">02</span> Tactile Sorting Under Visual Occlusion</h2>
@@ -134,80 +135,10 @@
       </div>
       <p class="fig-note">Gripper A: IEPE Dragonfly® sensor, 0–10&nbsp;kHz, nFFT&nbsp;=&nbsp;512 (2.9&nbsp;s temporal history).</p>
     </div>
-  </section>
-
-  <!-- BENCHMARK -->
-  <section class="section" id="benchmark">
-    <div class="section-inner">
-      <h2><span class="kicker">03</span> Sensor &amp; Acquisition Benchmark</h2>
-      <p class="lede">Seven sensing technologies, spanning acceleration, force and strain, were evaluated on three gripper designs, each instrumented on the upper jaw, away from direct contact.</p>
-
-      <div class="bench-switch" id="benchSwitch" role="tablist" aria-label="Acquisition bench">
-        <button class="bench-btn is-active" data-bench="opendaq" role="tab" aria-selected="true">
-          <strong>IOLITE®-X · openDAQ™ bench</strong>
-          <span>Dewesoft IOLITE®-X · openDAQ™ · 24-bit, up to 100 kHz</span>
-        </button>
-        <button class="bench-btn" data-bench="teensy" role="tab" aria-selected="false">
-          <strong>Low-cost bench</strong>
-          <span>Teensy 4.1 · ADS8688 bench</span>
-        </button>
-      </div>
-      <p class="fig-note">IOLITE®-X · openDAQ™ is an expensive, high-end industrial/lab-grade acquisition system, while the Teensy 4.1 · ADS8688 bench is an open-source, off-the-shelf alternative built for roughly €100.</p>
-
-      <div class="bench-links" id="benchLinks">
-        <a id="datasetLink" href="#" target="_blank" rel="noopener">Dataset ↗</a>
-        <a id="modelLink" href="#" target="_blank" rel="noopener">Model ↗</a>
-      </div>
-
-      <div class="chart-wrap">
-        <div class="chart-legend-row">
-          <div class="chart-legend" id="chartLegend"></div>
-          <button class="link-btn" id="openFig2">View full published figure (Fig. 2) ↗</button>
-        </div>
-        <div class="bar-chart" id="barChart" aria-hidden="false"></div>
-      </div>
-
-      <div class="detail-panel" id="detailPanel"></div>
-    </div>
-  </section>
-
-  <!-- ATTENTION -->
-  <section class="section section-alt" id="attention">
-    <div class="section-inner">
-      <h2><span class="kicker">04</span> Attention &amp; Scene-Sensitivity Analysis</h2>
-      <p class="lede">Trained ACT models were analyzed with <strong>Emboviz</strong>, a LeRobot visualization framework, using two diagnostics: <strong>attention</strong> (internal weights during the forward pass) and <strong>scene sensitivity</strong> (how the output changes when regions of the input are occluded). Maps are averaged over time and across successful episodes, per box class.</p>
-
-      <img class="attn-demo" src="assets/img/attention/demo-photos.webp" alt="Robot shaking a box over the sorting bins with an attention heatmap overlaid on the tactile spectrogram" loading="lazy">
-
-      <div class="attn-controls">
-        <div class="box-switch" id="attnBoxTabs" role="tablist" aria-label="Box class">
-          <button class="box-btn is-active" data-abox="empty">
-            <img src="assets/img/boxicons/empty.webp" alt="" loading="lazy"><span>Empty</span>
-          </button>
-          <button class="box-btn" data-abox="spacer1">
-            <img src="assets/img/boxicons/spacer1.webp" alt="" loading="lazy"><span>1 Plastic Spacer</span>
-          </button>
-          <button class="box-btn" data-abox="spacer7">
-            <img src="assets/img/boxicons/spacer7.webp" alt="" loading="lazy"><span>7 Plastic Spacers</span>
-          </button>
-          <button class="box-btn" data-abox="nuts7">
-            <img src="assets/img/boxicons/nuts7.webp" alt="" loading="lazy"><span>7 Metallic Nuts</span>
-          </button>
-        </div>
-        <div class="attn-bandwidth" id="attnBandwidth" role="tablist" aria-label="Bandwidth">
-          <button class="is-active" data-aband="10khz">0–10 kHz</button>
-          <button data-aband="100khz">0–100 kHz</button>
-        </div>
-      </div>
-
-      <figure class="attn-figure">
-        <img id="attnImage" src="assets/img/attention/empty-10khz.webp" alt="Attention and scene-sensitivity maps for the empty box, 0-10 kHz" loading="lazy">
-      </figure>
-      <p class="fig-note">Left: mean attention. Right: mean scene sensitivity. Dashed lines mark the crop window used to build the spectrogram fed to the policy.</p>
-    </div>
-  </section>
-
-  <!-- FUTURE WORK
+  </section> 
+  
+  
+FUTURE WORK
   <section class="section" id="future">
     <div class="section-inner">
       <h2><span class="kicker">05</span> Open Questions &amp; Future Work</h2>
