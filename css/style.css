@@ -155,13 +155,14 @@ h2{ font-size:1.9rem; }
 .pipeline-figure{ margin-top:0; margin-bottom:2.5em; }
 .task-figure{ margin-top:2.5em; margin-bottom:0; }
 .pipeline-figure img, .task-figure img{ margin:0 auto; height:auto; max-width:100%; }
-.pipeline-figure img{ width:540px; }
+.pipeline-figure img{ width:700px; }
 .task-figure img{ width:720px; border-radius:8px; }
 .pipeline-figure figcaption, .task-figure figcaption{
   contain:inline-size; font-size:.9rem; color:var(--muted); margin-top:.8em;
 }
 
-.abstract-text{ max-width:56em; margin-top:1.5em; }
+.abstract-text{ max-width:56em; margin:1.5em auto 0; text-align:center; }
+#abstract h2{ text-align:center; }
 .abstract-text p{ margin:0 0 1em; }
 
 /* ---------- RESULTS: box switch + cams ---------- */
@@ -205,11 +206,23 @@ h2{ font-size:1.9rem; }
 
 .video-progress{
   position:relative; flex:1; height:7px; min-width:6em; border-radius:99px; cursor:pointer;
-  background:color-mix(in srgb, var(--border) 70%, transparent); overflow:hidden;
+  background:color-mix(in srgb, var(--border) 70%, transparent);
+  touch-action:none; user-select:none;
 }
+/* enlarge the grab area beyond the thin bar */
+.video-progress::before{ content:""; position:absolute; left:0; right:0; top:-9px; bottom:-9px; }
 .video-progress-buffered, .video-progress-played{
   position:absolute; top:0; left:0; height:100%; width:0%; border-radius:99px;
 }
+/* round drag handle at the end of the played bar */
+.video-progress-played::after{
+  content:""; position:absolute; right:-8px; top:-7px; width:16px; height:16px; margin:0;
+  border-radius:50%; background:var(--maxw); border:2px solid var(--navy-dark);
+  box-shadow:0 1px 4px rgba(0,0,0,.35); transition:transform .12s ease;
+}
+.video-progress:hover .video-progress-played::after,
+.video-progress.is-dragging .video-progress-played::after{ transform:scale(1.2); }
+.video-progress.is-dragging{ cursor:grabbing; }
 .video-progress-buffered{ background:color-mix(in srgb, var(--muted) 30%, transparent); transition:width .2s ease; }
 .video-progress-played{ background:var(--navy); }
 
@@ -314,19 +327,29 @@ h2{ font-size:1.9rem; }
   font-family:"Inter",sans-serif; font-size:.72rem; text-transform:uppercase; letter-spacing:.08em;
   color:var(--muted); margin:0 0 .5em;
 }
-.detail-block-title-row{ display:flex; align-items:center; gap:.5em; margin-bottom:.5em; }
+.detail-block-title-row{ display:flex; align-items:center; gap:1em; margin-bottom:.5em; }
 .detail-block-title-row .detail-block-title{ margin:0; }
 .info-toggle-wrap{ position:relative; display:inline-flex; }
 .info-toggle{
-  display:inline-flex; align-items:center; justify-content:center; width:1.2em; height:1.2em;
-  border-radius:50%; border:1px solid var(--muted); background:none; color:var(--muted);
-  font-size:.68rem; font-weight:700; line-height:1; cursor:pointer; padding:0;
+  display:inline-flex; align-items:center; justify-content:center; white-space:nowrap;
+  border-radius:99px; border:1px solid var(--muted); background:none; color:var(--muted);
+  font-size:.75rem; font-weight:700; line-height:1; cursor:pointer; padding:.3em .8em; margin:-.3em 0; /* negative margin: the pill never makes the title row taller */
 }
+.info-toggle{ position:relative; background:var(--card-bg); }
+/* thought-bubble tail: two small circles trailing down-left, out of the layout flow */
+.info-toggle::before, .info-toggle::after{
+  content:""; position:absolute; border:1px solid var(--muted); background:var(--card-bg); border-radius:50%;
+}
+.info-toggle::before{ width:6px; height:6px; left:.5em; bottom:-8px; }
+.info-toggle::after{ width:3.5px; height:3.5px; left:.1em; bottom:-13px; }
 .info-toggle:hover, .info-toggle[aria-expanded="true"]{ border-color:var(--navy); color:var(--navy); }
+.info-toggle:hover::before, .info-toggle:hover::after,
+.info-toggle[aria-expanded="true"]::before, .info-toggle[aria-expanded="true"]::after{ border-color:var(--navy); }
 
 .detail-left-col{ display:flex; flex-direction:column; }
-.detail-photo-wrap{ position:relative; border-radius:10px; overflow:hidden; border:1px solid var(--border); align-self:start; }
-.detail-photo-wrap img{ display:block; width:100%; }
+/* Every gripper photo gets Gripper C's height (its photos are 1000x504); taller A/B photos are scaled down to fit it. */
+.detail-photo-wrap{ position:relative; align-self:stretch; aspect-ratio:1000/504; display:flex; justify-content:flex-start; }
+.detail-photo-wrap img{ display:block; height:100%; width:auto; max-width:100%; border-radius:10px; border:1px solid var(--border); }
 .detail-left-col .detail-note{ margin-top:.9em; }
 
 .detail-side{ display:flex; flex-direction:column; gap:1.2em; }
@@ -336,7 +359,7 @@ h2{ font-size:1.9rem; }
 
 .detail-confmat-caption{
   position:absolute; bottom:calc(100% + 10px); left:50%; transform:translateX(-50%);
-  width:min(360px, 85vw); font-size:.8rem; color:var(--text); line-height:1.5; text-align:left;
+  width:min(460px, 85vw); font-size:.8rem; color:var(--text); line-height:1.5; text-align:left;
   background:var(--card-bg); border:1px solid var(--border); border-radius:10px;
   padding:.8em 1em; margin:0; box-shadow:var(--shadow); z-index:20;
 }
@@ -363,8 +386,15 @@ h2{ font-size:1.9rem; }
   background:var(--card-bg); border-color:var(--navy); color:var(--navy);
   box-shadow:inset 0 0 0 1px var(--navy), 0 0 0 3px color-mix(in srgb, var(--navy) 14%, transparent);
 }
-.attn-figure{ margin:0; background:var(--card-bg); border:1px solid var(--border); border-radius:var(--radius); padding:1em; }
-.attn-figure img{ border-radius:6px; }
+.cam-grid-4{ display:grid; grid-template-columns:repeat(3,1fr); gap:1.4em; align-items:start; }
+.cam-grid-4[data-mode="sensitivity"]{ grid-template-columns:minmax(0,22em); justify-content:center; }
+.cam-slot[hidden]{ display:none; }
+.cam-slot-square h3{ width:100%; }
+.cam-video-frame-square{ aspect-ratio:1/1; width:100%; margin:0; }
+.cam-grid-4[data-mode="attention"] .cam-video-frame-square{ width:75%; margin:0 auto; }
+.cam-grid-4[data-mode="attention"] .cam-slot-square h3{ width:75%; margin-left:auto; margin-right:auto; }
+.attn-options{ display:flex; flex-wrap:wrap; gap:1em; align-items:center; }
+@media (max-width:900px){ .cam-grid-4{ grid-template-columns:1fr; } }
 
 /* ---------- FUTURE WORK ---------- */
 .future-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:1.4em; margin-top:1.8em; }
@@ -375,7 +405,9 @@ h2{ font-size:1.9rem; }
 @media (max-width:600px){ .future-grid{ grid-template-columns:1fr; } }
 
 /* ---------- CONTACT / FOOTER ---------- */
-.contact-row{ display:flex; gap:1em; margin-top:1.4em; flex-wrap:wrap; }
+#contact .section-inner{ text-align:center; }
+#contact .lede{ margin-left:auto; margin-right:auto; }
+.contact-row{ display:flex; gap:1em; margin-top:1.4em; flex-wrap:wrap; justify-content:center; }
 .email-img{ height:1.1em; width:auto; display:block; }
 @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) .email-img{ filter:invert(1); } }
 :root[data-theme="dark"] .email-img{ filter:invert(1); }
@@ -391,4 +423,26 @@ h2{ font-size:1.9rem; }
 .lightbox-close{
   position:absolute; top:1.2em; right:1.4em; background:none; border:none; color:#fff;
   font-size:1.4rem; cursor:pointer;
+}
+
+/* ---------- ATTENTION PLAYER BAR ---------- */
+.player-bar{ gap:1em; flex-wrap:wrap; }
+.play-round{
+  flex:none; width:2.6em; height:2.6em; border-radius:50%; border:1px solid var(--border);
+  background:var(--card-bg); color:var(--text); cursor:pointer; display:grid; place-items:center; padding:0;
+}
+.play-round svg{ width:1.3em; height:1.3em; grid-area:1/1; }
+.play-round:hover, .play-round:focus-visible, .play-round.is-playing{ border-color:var(--navy); color:var(--navy); }
+.play-round.is-playing, .play-round:active{
+  box-shadow:inset 0 0 0 1px var(--navy), 0 0 0 3px color-mix(in srgb, var(--navy) 14%, transparent);
+}
+.play-round .ico-pause, .play-round.is-playing .ico-play{ display:none; }
+.play-round.is-playing .ico-pause{ display:block; }
+.player-bar .video-progress{ height:4px; min-width:8em; background:color-mix(in srgb, var(--muted) 25%, transparent); }
+.player-bar .video-progress-buffered{ display:none; }
+.player-time, .player-frame{ font-variant-numeric:tabular-nums; white-space:nowrap; font-size:.9rem; }
+.player-frame{ color:var(--muted); font-size:.9rem; }
+.speed-btn{
+  flex:none; min-width:3.4em; padding:.4em .8em; border-radius:8px; border:1px solid var(--border);
+  background:var(--card-bg); color:var(--text); font-weight:600; font-size:.85rem; cursor:pointer;
 }

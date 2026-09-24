@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/style.css?v=202609241639">
 </head>
 <body>
 
@@ -65,19 +65,17 @@
     <div class="section-inner">
       <figure class="pipeline-figure">
         <img src="assets/img/architecture-pipeline.webp" alt="Diagram of the ACT learning pipeline fusing top camera, wrist camera and spectrogram streams through a ResNet and transformer encoder/decoder" loading="lazy">
-        <figcaption>Top camera, wrist camera and tactile spectrogram share the same ResNet + transformer pipeline.</figcaption>
+        <figcaption>Learning pipeline, adapted from T. Z. Zhao et al. (2023)</figcaption>
       </figure>
 
-      <h2><span class="kicker">01</span> Abstract</h2>
+      <h2><span class="kicker"></span> Abstract</h2>
       <div class="abstract-text">
         <p>Tactile sensing is increasingly being incorporated into learning-based robotic manipulation, yet many existing approaches rely on spatially distributed sensors. Here we introduce <strong>SpectRobot</strong>, a framework that transforms single-point tactile signals into compact time-frequency spectrograms. They can be processed by standard vision encoders and integrated into learning pipelines originally developed for vision, while preserving temporal and frequency information unavailable to conventional cameras.</p>
-        <p>Rather than increasing spatial density through arrays of tactile elements, SpectRobot exploits the rich dynamics contained in sparse, high-bandwidth single-point measurements. </p>
-        <p>Our experiments demonstrate that <strong>(1)</strong> a robot can exploit single-point vibration signals to solve a visually occluded manipulation task; <strong>(2)</strong> temporal history strongly influences policy performance, while sensing bandwidth controls the spectral information available, with measurements extending to 100&nbsp;kHz; and <strong>(3)</strong> the same representation can be used across different tactile sensing technologies mediated by acceleration, force, or strain.</p>
       </div>
 
       <figure class="task-figure">
         <img src="assets/img/task-sequence.webp" alt="Three photos: robot grabbing a box, shaking it, and storing it in the correct bin" loading="lazy">
-        <figcaption>Grab, shake, and store — the robot infers hidden contents from the resulting tactile spectrogram alone.</figcaption>
+        <figcaption>The robot infers hidden contents from the resulting tactile spectrogram alone.</figcaption>
       </figure>
     </div>
   </section>
@@ -85,7 +83,7 @@
   <!-- RESULTS: 4 boxes x 3 cams -->
   <section class="section section-alt" id="results">
     <div class="section-inner">
-      <h2><span class="kicker">02</span> Tactile Sorting Under Visual Occlusion</h2>
+      <h2><span class="kicker"></span> Tactile Sorting Under Visual Occlusion</h2>
       <p class="lede">The robot picks up an opaque box, gently shakes it, and must infer one of four visually indistinguishable contents from vision <em>and</em> the resulting tactile spectrogram before placing the box in the corresponding bin.</p>
 
       <div class="box-switch" id="boxSwitch" role="tablist" aria-label="Box content">
@@ -124,12 +122,15 @@
             </div>
           </div>
         </div>
-        <div class="cam-box-controls">
-          <button class="play-all-btn" id="playAllBtn">
-            <svg viewBox="0 0 24 24" class="icon"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 8.5v7l6-3.5-6-3.5z" fill="currentColor"/></svg>
-            <span>Play episode</span>
+        <div class="cam-box-controls player-bar">
+          <button class="play-round" id="playAllBtn" type="button" aria-label="Play episode">
+            <svg viewBox="0 0 24 24" class="ico-play"><path d="M9 6.5v11l9-5.5-9-5.5z" fill="currentColor"/></svg>
+            <svg viewBox="0 0 24 24" class="ico-pause"><path d="M8 6h3v12H8zM13 6h3v12h-3z" fill="currentColor"/></svg>
           </button>
           <div class="video-progress" id="sharedProgress"><div class="video-progress-buffered"></div><div class="video-progress-played"></div></div>
+          <span class="player-time" id="sharedTime">0.00 / 0.00 s</span>
+          <span class="player-frame" id="sharedFrame">frame 0 / 0</span>
+          <button class="speed-btn" id="sharedSpeedBtn" type="button" aria-label="Playback speed">1×</button>
         </div>
       </div>
       <p class="fig-note">Gripper A: IEPE Dragonfly® sensor, 0–10&nbsp;kHz, nFFT&nbsp;=&nbsp;512 (2.9&nbsp;s temporal history).</p>
@@ -139,7 +140,7 @@
   <!-- BENCHMARK -->
   <section class="section" id="benchmark">
     <div class="section-inner">
-      <h2><span class="kicker">03</span> Sensor &amp; Acquisition Benchmark</h2>
+      <h2><span class="kicker"></span> Sensor &amp; Acquisition Benchmark</h2>
       <p class="lede">Seven sensing technologies, spanning acceleration, force and strain, were evaluated on three gripper designs, each instrumented on the upper jaw, away from direct contact.</p>
 
       <div class="bench-switch" id="benchSwitch" role="tablist" aria-label="Acquisition bench">
@@ -174,10 +175,9 @@
   <!-- ATTENTION -->
   <section class="section section-alt" id="attention">
     <div class="section-inner">
-      <h2><span class="kicker">04</span> Attention &amp; Scene-Sensitivity Analysis</h2>
-      <p class="lede">Trained ACT models were analyzed with <strong>Emboviz</strong>, a LeRobot visualization framework, using two diagnostics: <strong>attention</strong> (internal weights during the forward pass) and <strong>scene sensitivity</strong> (how the output changes when regions of the input are occluded). Maps are averaged over time and across successful episodes, per box class.</p>
+      <h2><span class="kicker"></span> Attention Analysis</h2>
+      <p class="lede">Trained ACT models were analyzed with <strong>Emboviz</strong>, a LeRobot visualization framework, using two diagnostics: <strong>attention</strong> (internal weights during the forward pass) and <strong>scene sensitivity</strong> (how the output changes when regions of the input are occluded). Overlays are shown frame by frame on one full episode per box class.</p>
 
-      <img class="attn-demo" src="assets/img/attention/demo-photos.webp" alt="Robot shaking a box over the sorting bins with an attention heatmap overlaid on the tactile spectrogram" loading="lazy">
 
       <div class="attn-controls">
         <div class="box-switch" id="attnBoxTabs" role="tablist" aria-label="Box class">
@@ -194,16 +194,55 @@
             <img src="assets/img/boxicons/nuts7.webp" alt="" loading="lazy"><span>7 Metallic Nuts</span>
           </button>
         </div>
-        <div class="attn-bandwidth" id="attnBandwidth" role="tablist" aria-label="Bandwidth">
-          <button class="is-active" data-aband="10khz">0–10 kHz</button>
-          <button data-aband="100khz">0–100 kHz</button>
-        </div>
+        <!-- scene sensitivity switch (disabled), was inside .attn-options
+                    <div class="attn-bandwidth" id="attnMode" role="tablist" aria-label="Diagnostic">
+            <button class="is-active" data-mode="attention">Attention</button>
+            <button data-mode="sensitivity">Scene sensitivity</button>
+          </div>
+        -->
       </div>
 
-      <figure class="attn-figure">
-        <img id="attnImage" src="assets/img/attention/empty-10khz.webp" alt="Attention and scene-sensitivity maps for the empty box, 0-10 kHz" loading="lazy">
-      </figure>
-      <p class="fig-note">Left: mean attention. Right: mean scene sensitivity. Dashed lines mark the crop window used to build the spectrogram fed to the policy.</p>
+      <div class="cam-box">
+        <div class="cam-grid-4" id="attnGrid" data-mode="attention">
+          <div class="cam-slot" data-kind="attention">
+            <h3>Top Camera · Attention</h3>
+            <div class="cam-video-frame">
+              <video preload="metadata" muted playsinline><source src="assets/video/act_ep0_primary_attention.mp4" type="video/mp4"></video>
+            </div>
+          </div>
+          <div class="cam-slot" data-kind="attention">
+            <h3>Wrist Camera · Attention</h3>
+            <div class="cam-video-frame">
+              <video preload="metadata" muted playsinline><source src="assets/video/act_ep0_wrist_attention.mp4" type="video/mp4"></video>
+            </div>
+          </div>
+          <div class="cam-slot cam-slot-square" data-kind="attention">
+            <h3>Spectrogram · Attention</h3>
+            <div class="cam-video-frame cam-video-frame-square">
+              <video preload="metadata" muted playsinline><source src="assets/video/act_ep0_spectro_attention.mp4" type="video/mp4"></video>
+            </div>
+          </div>
+          <!-- scene sensitivity video (disabled)
+          <div class="cam-slot cam-slot-square" data-kind="sensitivity" hidden>
+            <h3>Spectrogram · Scene Sensitivity</h3>
+            <div class="cam-video-frame cam-video-frame-square">
+              <video preload="metadata" muted playsinline><source src="assets/video/act_ep0_spectro_sensitivity.mp4" type="video/mp4"></video>
+            </div>
+          </div>
+          -->
+        </div>
+        <div class="cam-box-controls player-bar">
+          <button class="play-round" id="attnPlayBtn" type="button" aria-label="Play episode">
+            <svg viewBox="0 0 24 24" class="ico-play"><path d="M9 6.5v11l9-5.5-9-5.5z" fill="currentColor"/></svg>
+            <svg viewBox="0 0 24 24" class="ico-pause"><path d="M8 6h3v12H8zM13 6h3v12h-3z" fill="currentColor"/></svg>
+          </button>
+          <div class="video-progress" id="attnProgress"><div class="video-progress-buffered"></div><div class="video-progress-played"></div></div>
+          <span class="player-time" id="attnTime">0.00 / 0.00 s</span>
+          <span class="player-frame" id="attnFrame">frame 0 / 0</span>
+          <button class="speed-btn" id="attnSpeedBtn" type="button" aria-label="Playback speed">1×</button>
+        </div>
+      </div>
+      <!-- <p class="fig-note">Overlays are computed per frame on a full rollout episode of each box class. Scene sensitivity was only measurable for the tactile spectrogram, so the other cameras are not shown in that mode.</p> -->
     </div>
   </section>
 
@@ -235,16 +274,16 @@
   <!-- CONTACT -->
   <section class="section section-alt" id="contact">
     <div class="section-inner">
-      <h2><span class="kicker">06</span> Contact</h2>
+      <h2><span class="kicker"></span> Contact</h2>
       <p class="lede">Questions about the paper, the dataset, or reproducing the bench? Reach out.</p>
       <div class="contact-row">
         <span class="btn btn-static">
           <svg viewBox="0 0 24 24" class="icon"><path d="M3 6h18v12H3z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3 7l9 6 9-6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
-          <img class="email-img" src="assets/img/contact-email-ev.webp" alt="Emmanuel Virot's email address, shown as an image to deter scrapers">
+          <img class="email-img" src="assets/img/contact-email-ev.webp">
         </span>
         <span class="btn btn-static">
           <svg viewBox="0 0 24 24" class="icon"><path d="M3 6h18v12H3z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3 7l9 6 9-6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
-          <img class="email-img" src="assets/img/contact-email-jr.webp" alt="Joseph Rigal's email address, shown as an image to deter scrapers">
+          <img class="email-img" src="assets/img/contact-email-jr.webp">
         </span>
         <a class="btn" href="https://github.com/spectrobot-project" target="_blank" rel="noopener">GitHub Organization ↗</a>
       </div>
@@ -264,7 +303,7 @@
   <img id="lightboxImg" src="" alt="">
 </div>
 
-<script src="js/results.js"></script>
-<script src="js/app.js"></script>
+<script src="js/results.js?v=202609241636"></script>
+<script src="js/app.js?v=202609241636"></script>
 </body>
 </html>

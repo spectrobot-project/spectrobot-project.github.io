@@ -30,7 +30,6 @@
   /* ---------------- Results: box switch + synced videos ---------------- */
   const boxSwitch = document.getElementById('boxSwitch');
   const camGrid3 = document.getElementById('camGrid3');
-  const playAllBtn = document.getElementById('playAllBtn');
 
   const VIDEO_SETS = {
     empty: { top: 'empty_top', wrist: 'empty_wrist', spectro: 'empty_spectro', gripper: 'Gripper A' },
@@ -39,30 +38,82 @@
     nuts7: { top: 'nuts7_top', wrist: 'nuts7_wrist', spectro: 'nuts7_spectro', gripper: 'Gripper A' },
   };
 
-  // The three cameras are one entangled recording of a single episode, so they share one progress bar
-  // (driven by the top-camera video) instead of three independent ones.
-  const sharedProgress = document.getElementById('sharedProgress');
-  const sharedPlayed = sharedProgress?.querySelector('.video-progress-played');
-  const sharedBuffered = sharedProgress?.querySelector('.video-progress-buffered');
+  /* ---------------- Shared episode player (round play, seek bar, time/frame, speed) ---------------- */
+  const PLAYER_FPS = 30;               // frame rate of every video on the page
+  const PLAYER_RATES = [1, 2, 0.5];    // click the speed button to cycle
 
-  function wireSharedProgress(masterVideo, allVids) {
-    const updatePlayed = () => { if (masterVideo.duration) sharedPlayed.style.width = `${masterVideo.currentTime / masterVideo.duration * 100}%`; };
-    const updateBuffered = () => {
-      if (masterVideo.buffered.length && masterVideo.duration) {
-        const end = masterVideo.buffered.end(masterVideo.buffered.length - 1);
-        sharedBuffered.style.width = `${Math.min(100, end / masterVideo.duration * 100)}%`;
-      }
+  // Click or drag on a progress bar to seek; `seekTo(fraction)` does the work.
+  function wireDragSeek(bar, seekTo) {
+    const fraction = e => {
+      const r = bar.getBoundingClientRect();
+      return Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
     };
-    masterVideo.addEventListener('timeupdate', updatePlayed);
-    masterVideo.addEventListener('progress', updateBuffered);
-    masterVideo.addEventListener('loadedmetadata', () => { updatePlayed(); updateBuffered(); });
-    masterVideo.addEventListener('seeked', updatePlayed);
-    sharedProgress?.addEventListener('click', e => {
-      if (!masterVideo.duration) return;
-      const rect = sharedProgress.getBoundingClientRect();
-      const t = (e.clientX - rect.left) / rect.width * masterVideo.duration;
-      allVids.forEach(v => { v.currentTime = t; });
+    bar.addEventListener('pointerdown', e => {
+      bar.setPointerCapture(e.pointerId);
+      bar.classList.add('is-dragging');
+      seekTo(fraction(e));
     });
+    bar.addEventListener('pointermove', e => {
+      if (bar.hasPointerCapture(e.pointerId)) seekTo(fraction(e));
+    });
+    const end = e => { bar.classList.remove('is-dragging'); if (bar.hasPointerCapture(e.pointerId)) bar.releasePointerCapture(e.pointerId); };
+    bar.addEventListener('pointerup', end);
+    bar.addEventListener('pointercancel', end);
+  }
+
+  // The videos of one grid are one entangled recording, so they share one bar, driven by the first visible video.
+  function createPlayer({ grid, playBtn, progress, timeEl, frameEl, speedBtn }) {
+    const played = progress.querySelector('.video-progress-played');
+    const vids = () => [...grid.querySelectorAll('.cam-slot:not([hidden]) video')];
+    const allVids = () => [...grid.querySelectorAll('video')];
+    let rate = 1;
+    let raf = 0;
+
+    function sync() {
+      const m = vids()[0];
+      if (!m || !m.duration) return;
+      played.style.width = `${m.currentTime / m.duration * 100}%`;
+      timeEl.textContent = `${m.currentTime.toFixed(2)} / ${m.duration.toFixed(2)} s`;
+      frameEl.textContent = `frame ${Math.round(m.currentTime * PLAYER_FPS)} / ${Math.round(m.duration * PLAYER_FPS)}`;
+    }
+    function tick() { sync(); if (playBtn.classList.contains('is-playing')) raf = requestAnimationFrame(tick); }
+    function setPlaying(playing) {
+      playBtn.classList.toggle('is-playing', playing);
+      playBtn.setAttribute('aria-label', playing ? 'Pause episode' : 'Play episode');
+      cancelAnimationFrame(raf);
+      if (playing) tick(); else sync();
+    }
+    function applyRate() { allVids().forEach(v => { v.defaultPlaybackRate = rate; v.playbackRate = rate; }); }
+
+    grid.addEventListener('timeupdate', e => { if (e.target === vids()[0]) sync(); }, true);
+    grid.addEventListener('loadedmetadata', e => { if (e.target === vids()[0]) sync(); }, true);
+    grid.addEventListener('ended', e => {
+      if (e.target.tagName === 'VIDEO' && vids().every(v => v.paused || v.ended)) setPlaying(false);
+    }, true);
+    wireDragSeek(progress, f => {
+      const m = vids()[0];
+      if (!m || !m.duration) return;
+      vids().forEach(v => { v.currentTime = f * m.duration; });
+      sync();
+    });
+    playBtn.addEventListener('click', () => {
+      const playing = !playBtn.classList.contains('is-playing');
+      vids().forEach(v => {
+        if (playing) { if (v.ended) v.currentTime = 0; v.play().catch(() => {}); } else v.pause();
+      });
+      setPlaying(playing);
+    });
+    speedBtn.addEventListener('click', () => {
+      rate = PLAYER_RATES[(PLAYER_RATES.indexOf(rate) + 1) % PLAYER_RATES.length];
+      speedBtn.textContent = `${rate}×`;
+      applyRate();
+    });
+    return {
+      // Call after swapping video sources.
+      reset() { allVids().forEach(v => v.pause()); applyRate(); setPlaying(false); played.style.width = '0%'; },
+      // Call after showing/hiding slots: back to the start, paused.
+      restart() { allVids().forEach(v => { v.pause(); v.currentTime = 0; }); setPlaying(false); played.style.width = '0%'; },
+    };
   }
 
   function loadBoxVideos(box) {
@@ -80,16 +131,17 @@
       video.load();
       video.dataset.group = box;
     });
-    if (sharedPlayed) sharedPlayed.style.width = '0%';
-    if (sharedBuffered) sharedBuffered.style.width = '0%';
-    playAllBtn.classList.remove('is-playing');
-    playAllBtn.querySelector('span').textContent = 'Play episode';
+    resultsPlayer?.reset();
   }
 
-  {
-    const vids = camGrid3 ? [...camGrid3.querySelectorAll('video')] : [];
-    if (vids[0]) wireSharedProgress(vids[0], vids);
-  }
+  const resultsPlayer = camGrid3 ? createPlayer({
+    grid: camGrid3,
+    playBtn: document.getElementById('playAllBtn'),
+    progress: document.getElementById('sharedProgress'),
+    timeEl: document.getElementById('sharedTime'),
+    frameEl: document.getElementById('sharedFrame'),
+    speedBtn: document.getElementById('sharedSpeedBtn'),
+  }) : null;
 
   boxSwitch?.addEventListener('click', e => {
     const btn = e.target.closest('.box-btn');
@@ -101,29 +153,6 @@
     });
     loadBoxVideos(box);
   });
-
-  function allVideos() { return [...camGrid3.querySelectorAll('video')]; }
-
-  playAllBtn?.addEventListener('click', () => {
-    const vids = allVideos();
-    const playing = !playAllBtn.classList.contains('is-playing');
-    if (playing) {
-      vids.forEach(v => { v.currentTime = 0; v.play().catch(() => {}); });
-      playAllBtn.classList.add('is-playing');
-      playAllBtn.querySelector('span').textContent = 'Pause episode';
-    } else {
-      vids.forEach(v => v.pause());
-      playAllBtn.classList.remove('is-playing');
-      playAllBtn.querySelector('span').textContent = 'Play episode';
-    }
-  });
-  camGrid3?.addEventListener('ended', e => {
-    if (e.target.tagName !== 'VIDEO') return;
-    if (allVideos().every(v => v.paused || v.ended)) {
-      playAllBtn.classList.remove('is-playing');
-      playAllBtn.querySelector('span').textContent = 'Play episode';
-    }
-  }, true);
 
   /* ---------------- Benchmark data ---------------- */
   // Per-sensor gripper photos, each with a red box pre-drawn around that specific sensor.
@@ -142,7 +171,7 @@
     },
     b: {
       label: 'Gripper B',
-      desc: 'The gripper was redesigned to place an IEPE load cell directly in the load path, measuring the resultant force transmitted through the structure.',
+      desc: 'The gripper was redesigned to place an IEPE load cell directly in the load path, measuring the resultant force transmitted through the structure. We add to redisign the entire gripper around the load-cell to integarte it. ',
       sensors: [
         { id: 'dgf-ldc', name: 'IEPE Dragonfly®', abbr: 'dgf', note: 'Industrial grade reference sensor bonded to every gripper design to monitor dataset-level consistency.'},
         { id: 'loadcell', name: 'IEPE Load Cell', abbr: 'ldc', note: 'Measures transmitted force rather than local contact deformation; no true static response. Includes episodes where the box could not be delivered to a bin.' },
@@ -192,7 +221,7 @@
   // Confusion matrix drawn as an SVG data URI so it drops into the same <img> slot as a figure.
   function confmatSrc(confmat) {
     const cell = 164, gap = 2, pad = 20, size = pad * 2 + cell * 4 + gap * 3;
-    const lo = [200, 216, 250], hi = [30, 78, 216]; // 0 -> light blue, 20 -> --navy
+    const lo = [254, 226, 226], hi = [204, 27, 27]; // 0 -> very light red, 20 -> red
     const mix = t => `rgb(${lo.map((c, k) => Math.round(c + (hi[k] - c) * t)).join(',')})`;
     const cells = confmat.flatMap((row, r) => row.map((v, c) => {
       const x = pad + c * (cell + gap), y = pad + r * (cell + gap);
@@ -420,7 +449,7 @@
           <div class="detail-block-title-row">
             <h4 class="detail-block-title">Confusion matrix</h4>
             <span class="info-toggle-wrap">
-              <button class="info-toggle" id="confmatInfoBtn" type="button" aria-expanded="false" title="How to read this">?</button>
+              <button class="info-toggle" id="confmatInfoBtn" type="button" aria-expanded="false" title="How to read this">Confused ?</button>
               <p class="detail-confmat-caption" id="confmatCaption" hidden>Each row is the box's true contents (0 = Empty, 1 = 1 Spacer, 2 = 7 Spacers, 3 = 7 Nuts); each column is the bin the robot chose, and the diagonal is correct placements. Out of 80 episodes total, each row starts from 20 — sometimes fewer, when the box wasn't picked up or a grasp failure kept it from reaching a bin.</p>
             </span>
           </div>
@@ -507,28 +536,38 @@
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && !lightbox.hidden) lightbox.hidden = true; });
 
   /* ---------------- Attention section ---------------- */
-  let attnBox = 'empty';
-  let attnBand = '10khz';
-  const attnImage = document.getElementById('attnImage');
-  const ATTN_ALT = {
-    empty: 'empty box', spacer1: '1 plastic spacer', spacer7: '7 plastic spacers', nuts7: '7 metallic nuts',
-  };
-  function updateAttnImage() {
-    attnImage.src = `assets/img/attention/${attnBox}-${attnBand}.webp`;
-    attnImage.alt = `Attention and scene-sensitivity maps for ${ATTN_ALT[attnBox]}, 0–${attnBand === '10khz' ? '10' : '100'} kHz`;
+  // Box class -> episode of the full-episode rollout used for that class.
+  const ATTN_EPISODE = { empty: 0, spacer1: 20, spacer7: 40, nuts7: 60 };
+  const ATTN_STREAMS = ['primary_attention', 'wrist_attention', 'spectro_attention', 'spectro_sensitivity'];
+  const attnGrid = document.getElementById('attnGrid');
+  const attnPlayer = attnGrid ? createPlayer({
+    grid: attnGrid,
+    playBtn: document.getElementById('attnPlayBtn'),
+    progress: document.getElementById('attnProgress'),
+    timeEl: document.getElementById('attnTime'),
+    frameEl: document.getElementById('attnFrame'),
+    speedBtn: document.getElementById('attnSpeedBtn'),
+  }) : null;
+  function loadAttnVideos(box) {
+    attnGrid.querySelectorAll('video').forEach((video, i) => {
+      video.pause();
+      video.querySelector('source').src = `assets/video/act_ep${ATTN_EPISODE[box]}_${ATTN_STREAMS[i]}.mp4`;
+      video.load();
+    });
+    attnPlayer.reset();
   }
   document.getElementById('attnBoxTabs')?.addEventListener('click', e => {
     const btn = e.target.closest('button');
     if (!btn) return;
-    attnBox = btn.dataset.abox;
     document.querySelectorAll('#attnBoxTabs button').forEach(b => b.classList.toggle('is-active', b === btn));
-    updateAttnImage();
+    loadAttnVideos(btn.dataset.abox);
   });
-  document.getElementById('attnBandwidth')?.addEventListener('click', e => {
+  document.getElementById('attnMode')?.addEventListener('click', e => {
     const btn = e.target.closest('button');
     if (!btn) return;
-    attnBand = btn.dataset.aband;
-    document.querySelectorAll('#attnBandwidth button').forEach(b => b.classList.toggle('is-active', b === btn));
-    updateAttnImage();
+    document.querySelectorAll('#attnMode button').forEach(b => b.classList.toggle('is-active', b === btn));
+    attnGrid.dataset.mode = btn.dataset.mode;
+    attnGrid.querySelectorAll('.cam-slot').forEach(s => { s.hidden = s.dataset.kind !== btn.dataset.mode; });
+    attnPlayer.restart();
   });
 })();
