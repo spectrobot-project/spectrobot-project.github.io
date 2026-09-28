@@ -145,6 +145,23 @@ h2{ font-size:1.9rem; }
 .lede{ max-width:52em; color:var(--muted); font-size:1.02rem; }
 .fig-note{ color:var(--muted); font-size:.85rem; margin-top:.6em; }
 
+/* ---------- CITATION ---------- */
+.bibtex-box{
+  position:relative; margin-top:1.2em;
+  background:var(--card-bg); border:1px solid var(--border); border-radius:var(--radius);
+}
+.bibtex-box pre{
+  margin:0; padding:1.2em 1.4em; overflow-x:auto;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:.85rem; line-height:1.55;
+  color:var(--text);
+}
+.bibtex-copy{
+  position:absolute; top:.7em; right:.7em;
+  padding:.35em .8em; border-radius:8px; border:1px solid var(--border);
+  background:var(--bg-alt); color:var(--text); font:600 .8rem "Inter",sans-serif; cursor:pointer;
+}
+.bibtex-copy:hover{ border-color:var(--navy); color:var(--navy); }
+
 /* ---------- ABSTRACT ---------- */
 /* Figures shrink-wrap their image; the caption wraps to the image width instead of widening the box */
 .pipeline-figure, .task-figure{

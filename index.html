@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=202609241639">
+<link rel="stylesheet" href="css/style.css?v=202609281200">
 </head>
 <body>
 
@@ -28,6 +28,7 @@
       <a href="#attention">Attention</a>
       <!-- <a href="#future">Future Work</a> -->
       <a href="#contact">Contact</a>
+      <a href="#citation">Cite</a>
     </nav>
   </div>
 </header>
@@ -51,8 +52,10 @@
             <svg viewBox="0 0 24 24" class="icon"><path d="M12 3v13M12 16l-4-4M12 16l4-4M5 20h14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
             Dataset
           </a>
-          <a class="btn" href="https://github.com/spectrobot-project" target="_blank" rel="noopener">
-            <svg viewBox="0 0 24 24" class="icon"><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.7 5.4 3 5.4 3a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.4c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <a class="btn" href="https://github.com/spectrobot-project/spectrobot" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" class="icon"><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.7 5.4 3 5.4 3a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.4c0 4.6 2.7 
+5.7 5.5 6-.6.6-.6 1.2-.5 
+2V21" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
             Code
           </a>
         </div>
@@ -290,6 +293,26 @@
     </div>
   </section>
 
+  <!-- CITATION -->
+  <section class="section" id="citation">
+    <div class="section-inner">
+      <h2><span class="kicker"></span> Citation</h2>
+      <p class="lede">If you use SpectRobot in your research, please cite our <a href="https://arxiv.org/abs/2609.24621" target="_blank" rel="noopener">arXiv paper</a>.</p>
+      <div class="bibtex-box">
+        <button class="bibtex-copy" id="bibtexCopy" type="button">Copy</button>
+        <pre id="bibtex"><code>@misc{rigal2026spectrobot,
+  title         = {SpectRobot: Learning tactile perception from high-bandwidth single-point sensing},
+  author        = {Rigal, Joseph and Virot, Emmanuel and Pascal, Caroline},
+  year          = {2026},
+  eprint        = {2609.24621},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.RO},
+  url           = {https://arxiv.org/abs/2609.24621}
+}</code></pre>
+      </div>
+    </div>
+  </section>
+
 </main>
 
 <footer class="site-footer">
@@ -305,5 +328,14 @@
 
 <script src="js/results.js?v=202609241636"></script>
 <script src="js/app.js?v=202609241636"></script>
+<script>
+  document.getElementById("bibtexCopy").addEventListener("click", function () {
+    var btn = this;
+    navigator.clipboard.writeText(document.getElementById("bibtex").innerText).then(function () {
+      btn.textContent = "Copied!";
+      setTimeout(function () { btn.textContent = "Copy"; }, 1500);
+    });
+  });
+</script>
 </body>
 </html>
