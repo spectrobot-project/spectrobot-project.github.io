@@ -1,6 +1,11 @@
 (() => {
   'use strict';
 
+  function formatRegistered(text) {
+    return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/®/g, '<sup class="registered-mark">®</sup>');
+  }
+
   /* ---------------- Nav ---------------- */
   const navToggle = document.getElementById('navToggle');
   const chapters = document.getElementById('chapters');
@@ -68,6 +73,8 @@
     const allVids = () => [...grid.querySelectorAll('video')];
     let rate = 1;
     let raf = 0;
+    let playRequest = 0;
+    let autoplayPending = true;
 
     function sync() {
       const m = vids()[0];
@@ -84,6 +91,26 @@
       if (playing) tick(); else sync();
     }
     function applyRate() { allVids().forEach(v => { v.defaultPlaybackRate = rate; v.playbackRate = rate; }); }
+    function pause() {
+      playRequest++;
+      allVids().forEach(v => v.pause());
+      setPlaying(false);
+    }
+    function play() {
+      const request = ++playRequest;
+      setPlaying(true);
+      Promise.all(vids().map(v => {
+        v.muted = true;
+        if (v.ended) v.currentTime = 0;
+        return v.play();
+      })).catch(error => {
+        // Leave the manual play button available if autoplay is blocked.
+        if (request === playRequest) {
+          pause();
+          console.warn('Video playback failed:', error);
+        }
+      });
+    }
 
     grid.addEventListener('timeupdate', e => { if (e.target === vids()[0]) sync(); }, true);
     grid.addEventListener('loadedmetadata', e => { if (e.target === vids()[0]) sync(); }, true);
@@ -97,22 +124,32 @@
       sync();
     });
     playBtn.addEventListener('click', () => {
-      const playing = !playBtn.classList.contains('is-playing');
-      vids().forEach(v => {
-        if (playing) { if (v.ended) v.currentTime = 0; v.play().catch(() => {}); } else v.pause();
-      });
-      setPlaying(playing);
+      autoplayPending = false;
+      if (playBtn.classList.contains('is-playing')) pause(); else play();
     });
     speedBtn.addEventListener('click', () => {
       rate = PLAYER_RATES[(PLAYER_RATES.indexOf(rate) + 1) % PLAYER_RATES.length];
       speedBtn.textContent = `${rate}×`;
       applyRate();
     });
+    // Start when the player is visible, so short clips do not finish offscreen.
+    if ('IntersectionObserver' in window) {
+      const autoplayObserver = new IntersectionObserver(entries => {
+        if (entries.some(entry => entry.isIntersecting)) {
+          autoplayObserver.disconnect();
+          if (autoplayPending) { autoplayPending = false; play(); }
+        }
+      }, { threshold: 0.25 });
+      autoplayObserver.observe(grid);
+    } else {
+      autoplayPending = false;
+      play();
+    }
     return {
       // Call after swapping video sources.
-      reset() { allVids().forEach(v => v.pause()); applyRate(); setPlaying(false); played.style.width = '0%'; },
-      // Call after showing/hiding slots: back to the start, paused.
-      restart() { allVids().forEach(v => { v.pause(); v.currentTime = 0; }); setPlaying(false); played.style.width = '0%'; },
+      reset() { autoplayPending = false; pause(); applyRate(); played.style.width = '0%'; play(); },
+      // Call after showing/hiding slots: play again from the start.
+      restart() { autoplayPending = false; pause(); allVids().forEach(v => { v.currentTime = 0; }); played.style.width = '0%'; play(); },
     };
   }
 
@@ -162,54 +199,54 @@
   const GRIPPERS = {
     a: {
       label: 'Gripper A',
-      desc: 'First gripper carrying an IEPE Dragonfly® strain sensor and an IEPE accelerometer, mounted on the upper jaw, high-end sensors to test the performance of the spectrobot pipeline.',
+      desc: 'Gripper carrying an IEPE Dragonfly® strain sensor and an IEPE accelerometer, both mounted on the upper jaw.',
       sensors: [
-        { id: 'dgf-acc', name: 'IEPE Dragonfly®', abbr: 'dgf', note: 'The IEPE Dragonfly® is an industrial grade reference sensor bonded to every gripper design to monitor dataset-level consistency. It is a thin piezoelectrocal sensor (5µm thin with a noise level around 10 nm/m). It can be easely glued to any surface with it\'s flexible body.' },
-        { id: 'acc', name: 'IEPE Accelerometer', abbr: 'acc', note: 'Industrial grade piezo accelerometer from PCB piezo, very expensive sensor around 1.5k$.'  },
-        { id: 'notact', name: 'No Tactile Sensor', abbr: 'none', note: 'Vision-only baseline, we removed the spectrogram of the sensors for the training and inference processes.It remains close to 25% which is the random chance level for 4 classes.' },
+        { id: 'dgf-acc', name: 'IEPE Dragonfly®', abbr: 'IEPE Dragonfly®', note: 'The IEPE Dragonfly® is a thin, flexible piezoelectric strain sensor characterized by a low noise level. It serves as a reference sensor across the different gripper designs to assess consistency at the dataset level.' },
+        { id: 'acc', name: 'IEPE accelerometer', abbr: 'IEPE accelerometer', note: 'The IEPE accelerometer is a piezoelectric accelerometer used for measuring vibrations.'  },
+        { id: 'notact', name: 'No tactile sensor', abbr: 'No tactile sensor', note: 'Vision-only baseline. Sensor spectrograms were removed during both training and inference. Performance remains close to 25%, corresponding to the random-chance level for four classes.' },
       ],
     },
     b: {
       label: 'Gripper B',
-      desc: 'The gripper was redesigned to place an IEPE load cell directly in the load path, measuring the resultant force transmitted through the structure. We add to redisign the entire gripper around the load-cell to integarte it. ',
+      desc: 'The gripper was redesigned to place a load cell directly in the load path, measuring the resultant force transmitted through the structure.',
       sensors: [
-        { id: 'dgf-ldc', name: 'IEPE Dragonfly®', abbr: 'dgf', note: 'The IEPE Dragonfly® is an industrial grade reference sensor bonded to every gripper design to monitor dataset-level consistency. It is a thin piezoelectrocal sensor (5µm thin with a noise level around 10 nm/m). It can be easely glued to any surface with it\'s flexible body.'},
-        { id: 'loadcell', name: 'IEPE Load Cell', abbr: 'ldc', note: 'The load cell measures transmitted force rather than local contact deformation; it failes to capture the full dynamics of the objects i the boxe. ' },
+        { id: 'dgf-ldc', name: 'IEPE Dragonfly®', abbr: 'IEPE Dragonfly®', note: 'The IEPE Dragonfly® is a thin, flexible piezoelectric strain sensor characterized by a low noise level. It serves as a reference sensor across the different gripper designs to assess consistency at the dataset level.' },
+        { id: 'loadcell', name: 'IEPE load cell', abbr: 'IEPE load cell', note: 'The IEPE load cell measures transmitted force rather than local contact deformation. It fails to capture the full dynamics of the objects in the box.' },
       ],
     },
     c: {
       label: 'Gripper C',
-      desc: 'A five-sensor gripper comparing a passive (charge-output) Dragonfly®, a low-cost PZT disk, a MEMS accelerometer, and a metallic strain gauge, alongside the IEPE Dragonfly® reference.',
+      desc: 'A five-sensor gripper comparing a passive Dragonfly®, a PZT disk, a MEMS accelerometer, and a metallic strain gauge, alongside the IEPE Dragonfly® reference sensor.',
       sensors: [
-        { id: 'dgf-frank', name: 'IEPE Dragonfly®', abbr: 'dgf', note: 'The IEPE Dragonfly® is an industrial grade reference sensor bonded to every gripper design to monitor dataset-level consistency. It is a thin piezoelectrocal sensor (5µm thin with a noise level around 10 nm/m). It can be easely glued to any surface with it\'s flexible body.' },
-        { id: 'dgf-passif', name: 'Passive Dragonfly®', abbr: 'dgfp', note: 'The passive dragonfly outputs charge directly, and have the capability as the IEPE Dragonfly®, but without the protection from electrical interference delivered by the IEPE module.' },
-        { id: 'pzt', name: 'PZT Disk', abbr: 'pzt', note: 'Low-cost bulk PZT; brittle, very low-cost, toxic trace of lead.' },
-        { id: 'acc-mems', name: 'MEMS Accelerometer', abbr: 'mems', note: 'Classical accelerometer used in IMUs, limited by a resonance around 5 kHz.' },
-        { id: 'strain-gauge', name: 'Metallic Strain Gauge', abbr: 'stg', note: 'Captures static strain but shows broader confusion among plastic-content classes, very low signal energy output.' },
+        { id: 'dgf-frank', name: 'IEPE Dragonfly®', abbr: 'IEPE Dragonfly®', note: 'The IEPE Dragonfly® is a thin, flexible piezoelectric strain sensor characterized by a low noise level. It serves as a reference sensor across the different gripper designs to assess consistency at the dataset level.' },
+        { id: 'dgf-passif', name: 'Passive Dragonfly®', abbr: 'Passive Dragonfly®', note: 'The passive Dragonfly® outputs charge directly and provides sensing capabilities similar to those of the IEPE Dragonfly®, but without the signal conditioning.' },
+        { id: 'pzt', name: 'PZT disk', abbr: 'PZT disk', note: 'The PZT disk is a bulk piezoelectric sensor with high sensitivity to vibration. Its main limitations are its mechanical brittleness and lead content.' },
+        { id: 'acc-mems', name: 'MEMS accelerometer', abbr: 'MEMS accelerometer', note: 'The MEMS accelerometer is commonly used in IMUs, with bandwidth limited by a resonance around 5 kHz.' },
+        { id: 'strain-gauge', name: 'Metallic strain gauge', abbr: 'Metallic strain gauge', note: 'The metallic strain gauge captures static strain but is relatively noisy.' },
       ],
     },
   };
 
   const TEENSY = {
-    label: 'Teensy 4.1 bench',
-    desc: 'A low-cost acquisition chain (≈100 €) built from a ZONRI IEPE interface converter, a 16-bit ADS8688 ADC, and a Teensy 4.1 microcontroller — roughly 10× noisier than the Dewesoft bench, evaluated on a separately collected dataset. The paper reports the three low-cost sensors at ≈82% averaged success.',
+    label: 'Low-cost acquisition system with Gripper C',
+    desc: 'A low-cost acquisition chain (≈100 €) built from a ZONRI IEPE interface converter, a 16-bit ADS8688 ADC, and a Teensy 4.1 microcontroller. It is much noisier than the high-fidelity acquisition system. It is evaluated on a separately collected dataset.',
     sensors: [
-      { id: 'dgf-frank-cheap', name: 'IEPE Dragonfly®', abbr: 'dgf', photo: sensorPhoto('dgf-frank') },
-      { id: 'pzt-cheap', name: 'PZT Disk', abbr: 'pzt', photo: sensorPhoto('pzt') },
-      { id: 'acc-mems-cheap', name: 'MEMS Accelerometer', abbr: 'mems', photo: sensorPhoto('acc-mems') },
-      { id: 'notact-cheap', name: 'No Tactile Sensor', abbr: 'none', photo: sensorPhoto('notact'), note: 'Vision-only baseline for the low-cost bench — spectrogram inputs removed for training and inference.' },
+      { id: 'dgf-frank-cheap', name: 'IEPE Dragonfly®', abbr: 'IEPE Dragonfly®', photo: sensorPhoto('dgf-frank') },
+      { id: 'pzt-cheap', name: 'PZT disk', abbr: 'PZT disk', photo: sensorPhoto('pzt') },
+      { id: 'acc-mems-cheap', name: 'MEMS accelerometer', abbr: 'MEMS accelerometer', photo: sensorPhoto('acc-mems') },
+      { id: 'notact-cheap', name: 'No tactile sensor', abbr: 'No tactile sensor', photo: sensorPhoto('notact') },
     ],
   };
 
   const SPECTRO = {
     tiltAbbr: true, // long setting labels are drawn at an angle so they don't overlap
-    label: 'Spectrogram settings (Gripper A, IEPE Dragonfly®)',
-    desc: 'Same Gripper A and IEPE Dragonfly® sensor on the IOLITE®-X · openDAQ™ bench, varying only the spectrogram input: FFT window length (nFFT) and frequency bandwidth.',
+    label: 'Spectrogram settings with Gripper A and IEPE Dragonfly®',
+    desc: 'Using Gripper A and IEPE Dragonfly® sensor on the high-fidelity acquisition system. We vary only the spectrogram configuration: FFT window length (nFFT) and frequency bandwidth.',
     sensors: [
-      { id: 'dgf-nfft64', name: 'IEPE Dragonfly® — Time window: 0.36s, 0–10 kHz', abbr: '0.36s 10kHz', photo: sensorPhoto('dgf-acc') },
-      { id: 'dgf-acc', name: 'IEPE Dragonfly® — Time window: 2.9s, 0–10 kHz', abbr: '2.9s 10kHz', note: 'Default setting used for every other benchmark result.' },
-      { id: 'dgf-100k-512', name: 'IEPE Dragonfly® — Time window: 0.29s, 0–100 kHz', abbr: '0.29s 100k', photo: sensorPhoto('dgf-acc') },
-      { id: 'dgf-100k-4096', name: 'IEPE Dragonfly® — Time window: 2.3s, 0–100 kHz', abbr: '2.3s 100k', photo: sensorPhoto('dgf-acc') },
+      { id: 'dgf-nfft64', name: 'IEPE Dragonfly® — Time window: 0.36 s — Bandwidth: 0–10 kHz', abbr: '0.36 s — 10 kHz', photo: sensorPhoto('dgf-acc') },
+      { id: 'dgf-acc', name: 'IEPE Dragonfly® — Time window: 2.9 s — Bandwidth: 0–10 kHz', abbr: '2.9 s — 10 kHz', note: 'Default setting used for every other benchmark result.' },
+      { id: 'dgf-100k-512', name: 'IEPE Dragonfly® — Time window: 0.29 s — Bandwidth: 0–100 kHz', abbr: '0.29 s — 100 kHz', photo: sensorPhoto('dgf-acc') },
+      { id: 'dgf-100k-4096', name: 'IEPE Dragonfly® — Time window: 2.3 s — Bandwidth: 0–100 kHz', abbr: '2.3 s — 100 kHz', photo: sensorPhoto('dgf-acc') },
     ],
   };
 
@@ -293,7 +330,7 @@
   }
 
   const SEG_CLASSES = ['seg-empty', 'seg-spacer1', 'seg-spacer7', 'seg-nuts7'];
-  const SEG_LABELS = ['Empty', 'Spacer', '7 Spacers', '7 Nuts'];
+  const SEG_LABELS = ['Empty', '1 plastic spacer', '7 plastic spacers', '7 metallic nuts'];
 
   // Benches drawn as a single bar group (the openDAQ bench is split into grippers A–C).
   const SINGLE_BENCHES = { teensy: TEENSY, spectro: SPECTRO };
@@ -306,7 +343,7 @@
   const legendEl = document.getElementById('chartLegend');
 
   function renderLegend() {
-    const items = [...SEG_LABELS.map((l, i) => [SEG_CLASSES[i], l]), ['seg-gf', 'Grasp / handling failure']];
+    const items = [...SEG_LABELS.map((l, i) => [SEG_CLASSES[i], l]), ['seg-gf', 'Grasp failure']];
     legendEl.innerHTML = items.map(([cls, label]) =>
       `<span class="sw"><span class="sw-swatch ${cls}"></span>${label}</span>`
     ).join('');
@@ -335,7 +372,7 @@
     return { lower: Math.max(0, center - margin), upper: Math.min(1, center + margin) };
   }
 
-  function buildGroup(groupKey, label, sensors, showAxis, tiltAbbr = false) {
+  function buildGroup(groupKey, label, sensors, showAxis, tiltAbbr = true) {
     const wrap = document.createElement('div');
     wrap.className = 'bar-group';
     if (tiltAbbr) wrap.classList.add('tilt-abbr');
@@ -424,7 +461,7 @@
 
     const lbl = document.createElement('div');
     lbl.className = 'bar-group-label';
-    lbl.textContent = label;
+    lbl.innerHTML = formatRegistered(label);
     wrap.appendChild(lbl);
     return wrap;
   }
@@ -449,11 +486,11 @@
 
     detailPanel.innerHTML = `
       <div class="detail-header">
-        <h3>${sensor.name}</h3>
+        <h3>${formatRegistered(sensor.name)}</h3>
         <span class="detail-rate">${pct}%</span>
-        <span class="detail-n">n = ${success}/80 successful placements, ${sensor.gf} grasp/handling failures</span>
+        <span class="detail-n">n = ${success}/80 successful placements, ${sensor.gf} grasp failures</span>
       </div>
-      ${sensor.note ? `<div class="detail-gripper-label">${sensor.note}</div>` : ''}
+      ${sensor.note ? `<div class="detail-gripper-label">${formatRegistered(sensor.note)}</div>` : ''}
       <div class="detail-left-col">
         <h4 class="detail-block-title">Gripper photo</h4>
         <div class="detail-photo-wrap">
@@ -466,15 +503,16 @@
             <h4 class="detail-block-title">Confusion matrix</h4>
             <span class="info-toggle-wrap">
               <button class="info-toggle" id="confmatInfoBtn" type="button" aria-expanded="false" title="How to read this">Confused ?</button>
-              <p class="detail-confmat-caption" id="confmatCaption" hidden>Each row is the box's true contents (0 = Empty, 1 = 1 Spacer, 2 = 7 Spacers, 3 = 7 Nuts); each column is the bin the robot chose, and the diagonal is correct placements. Out of 80 episodes total, each row starts from 20 — sometimes fewer, when the box wasn't picked up or a grasp failure kept it from reaching a bin.</p>
+                <p class="detail-confmat-caption" id="confmatCaption" hidden>
+                Each row represents the true contents of the box: 0 = empty, 1 = 1 plastic spacer, 2 = 7 plastic spacers, and 3 = 7 metallic nuts. Each column represents the bin selected by the robot. Values on the diagonal correspond to correct placements. Across the 80 total episodes, each row contains up to 20 trials. Some rows contain fewer trials because a grasp failure prevented the robot from reaching a bin.
+                </p>
             </span>
           </div>
           <img id="detailConfmat" src="${confmatSrc(sensor.confmat)}" alt="Confusion matrix for ${sensor.name}">
         </div>
       </div>
-      <p class="detail-note detail-gripper-desc">${groupData.label} — ${groupData.desc}</p>
+      <p class="detail-note detail-gripper-desc">${formatRegistered(groupData.label)} — ${formatRegistered(groupData.desc)}</p>
     `;
-    syncConfmatHeight();
   }
 
   function closeConfmatCaption() {
@@ -500,22 +538,6 @@
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') closeConfmatCaption();
   });
-
-  // Keep the confusion matrix the same height as the sensor photo, however tall that photo renders.
-  let confmatResizeObserver = null;
-  function syncConfmatHeight() {
-    confmatResizeObserver?.disconnect();
-    const photoImg = document.getElementById('detailPhoto');
-    const confmatImg = document.getElementById('detailConfmat');
-    if (!photoImg || !confmatImg || !('ResizeObserver' in window)) return;
-    const apply = () => {
-      const h = photoImg.getBoundingClientRect().height;
-      if (h > 0) confmatImg.style.height = `${h}px`;
-    };
-    if (photoImg.complete) apply(); else photoImg.addEventListener('load', apply, { once: true });
-    confmatResizeObserver = new ResizeObserver(apply);
-    confmatResizeObserver.observe(photoImg);
-  }
 
   document.getElementById('benchSwitch')?.addEventListener('click', e => {
     const btn = e.target.closest('.bench-btn');

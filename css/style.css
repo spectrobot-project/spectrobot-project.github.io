@@ -1,3 +1,5 @@
+.registered-mark{ font-size:.65em; line-height:0; vertical-align:super; }
+
 :root{
   --navy: #1d4ed8;
   --navy-dark: #10182c;
@@ -135,6 +137,7 @@ a{color:var(--navy);}
 
 /* ---------- SECTIONS ---------- */
 .section{ padding:4.5em 1.2em; }
+#abstract{ padding-top:1.5em; }
 .section-alt{ background:var(--bg-alt); }
 .section-inner{ max-width:var(--maxw); margin:0 auto; }
 .kicker{
@@ -332,6 +335,7 @@ h2{ font-size:1.9rem; }
 
 /* ---------- Detail panel: gripper photo + sensor outline + confmat ---------- */
 .detail-panel{
+  --detail-image-height:min(300px, 45vw);
   background:var(--card-bg); border:1px solid var(--border); border-radius:var(--radius);
   padding:1.6em; margin-top:2em;
   display:grid; grid-template-columns:1.2fr 1fr; gap:2em;
@@ -366,14 +370,14 @@ h2{ font-size:1.9rem; }
 .info-toggle[aria-expanded="true"]::before, .info-toggle[aria-expanded="true"]::after{ border-color:var(--navy); }
 
 .detail-left-col{ display:flex; flex-direction:column; }
-/* Every gripper photo gets Gripper C's height (its photos are 1000x504); taller A/B photos are scaled down to fit it. */
-.detail-photo-wrap{ position:relative; align-self:stretch; aspect-ratio:1000/504; display:flex; justify-content:flex-start; }
-.detail-photo-wrap img{ display:block; height:100%; width:auto; max-width:100%; border-radius:10px; border:1px solid var(--border); }
+/* One shared height across every sensor and benchmark; preserve image proportions. */
+.detail-photo-wrap{ position:relative; height:var(--detail-image-height); display:flex; justify-content:flex-start; }
+.detail-photo-wrap img{ display:block; height:var(--detail-image-height); width:auto; max-width:100%; object-fit:contain; border-radius:10px; border:1px solid var(--border); }
 .detail-gripper-desc{ grid-column:1 / -1; }
 
 .detail-side{ display:flex; flex-direction:column; gap:1.2em; }
 .detail-side-block img{ border-radius:8px; border:1px solid var(--border); max-width:100%; }
-#detailConfmat{ display:block; width:auto; margin:0; }
+#detailConfmat{ display:block; height:var(--detail-image-height); width:auto; max-width:100%; object-fit:contain; margin:0; }
 .detail-note{ font-size:.87rem; color:var(--muted); margin:0; }
 
 .detail-confmat-caption{
