@@ -369,7 +369,7 @@ h2{ font-size:1.9rem; }
 /* Every gripper photo gets Gripper C's height (its photos are 1000x504); taller A/B photos are scaled down to fit it. */
 .detail-photo-wrap{ position:relative; align-self:stretch; aspect-ratio:1000/504; display:flex; justify-content:flex-start; }
 .detail-photo-wrap img{ display:block; height:100%; width:auto; max-width:100%; border-radius:10px; border:1px solid var(--border); }
-.detail-left-col .detail-note{ margin-top:.9em; }
+.detail-gripper-desc{ grid-column:1 / -1; }
 
 .detail-side{ display:flex; flex-direction:column; gap:1.2em; }
 .detail-side-block img{ border-radius:8px; border:1px solid var(--border); max-width:100%; }

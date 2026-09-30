@@ -164,8 +164,8 @@
       label: 'Gripper A',
       desc: 'First gripper carrying an IEPE Dragonfly® strain sensor and an IEPE accelerometer, mounted on the upper jaw, high-end sensors to test the performance of the spectrobot pipeline.',
       sensors: [
-        { id: 'dgf-acc', name: 'IEPE Dragonfly®', abbr: 'dgf', note: 'The IEPE Dragonfly® is an industrial grade reference sensor bonded to every gripper design to monitor dataset-level consistency. It is a thin piezoelectrocal sensor (5µm thin with a noise level around 10 nm/m). It can be easely glued to any surface ( ' },
-        { id: 'acc', name: 'IEPE Accelerometer', abbr: 'acc', note: 'Industrial grade piezo accelerometer from PCB piezo.'  },
+        { id: 'dgf-acc', name: 'IEPE Dragonfly®', abbr: 'dgf', note: 'The IEPE Dragonfly® is an industrial grade reference sensor bonded to every gripper design to monitor dataset-level consistency. It is a thin piezoelectrocal sensor (5µm thin with a noise level around 10 nm/m). It can be easely glued to any surface with it\'s flexible body.' },
+        { id: 'acc', name: 'IEPE Accelerometer', abbr: 'acc', note: 'Industrial grade piezo accelerometer from PCB piezo, very expensive sensor around 1.5k$.'  },
         { id: 'notact', name: 'No Tactile Sensor', abbr: 'none', note: 'Vision-only baseline, we removed the spectrogram of the sensors for the training and inference processes.It remains close to 25% which is the random chance level for 4 classes.' },
       ],
     },
@@ -173,18 +173,18 @@
       label: 'Gripper B',
       desc: 'The gripper was redesigned to place an IEPE load cell directly in the load path, measuring the resultant force transmitted through the structure. We add to redisign the entire gripper around the load-cell to integarte it. ',
       sensors: [
-        { id: 'dgf-ldc', name: 'IEPE Dragonfly®', abbr: 'dgf', note: 'Industrial grade reference sensor bonded to every gripper design to monitor dataset-level consistency.'},
-        { id: 'loadcell', name: 'IEPE Load Cell', abbr: 'ldc', note: 'Measures transmitted force rather than local contact deformation; no true static response. Includes episodes where the box could not be delivered to a bin.' },
+        { id: 'dgf-ldc', name: 'IEPE Dragonfly®', abbr: 'dgf', note: 'The IEPE Dragonfly® is an industrial grade reference sensor bonded to every gripper design to monitor dataset-level consistency. It is a thin piezoelectrocal sensor (5µm thin with a noise level around 10 nm/m). It can be easely glued to any surface with it\'s flexible body.'},
+        { id: 'loadcell', name: 'IEPE Load Cell', abbr: 'ldc', note: 'The load cell measures transmitted force rather than local contact deformation; it failes to capture the full dynamics of the objects i the boxe. ' },
       ],
     },
     c: {
       label: 'Gripper C',
       desc: 'A five-sensor gripper comparing a passive (charge-output) Dragonfly®, a low-cost PZT disk, a MEMS accelerometer, and a metallic strain gauge, alongside the IEPE Dragonfly® reference.',
       sensors: [
-        { id: 'dgf-frank', name: 'IEPE Dragonfly®', abbr: 'dgf', note: 'Industrial grade reference sensor bonded to every gripper design to monitor dataset-level consistency.' },
-        { id: 'dgf-passif', name: 'Passive Dragonfly®', abbr: 'dgfp', note: 'The passive dragonfly outputs charge directly — no sensor-side power needed.' },
-        { id: 'pzt', name: 'PZT Disk', abbr: 'pzt', note: 'Low-cost bulk PZT; brittle, very low-cost, hight noise level.' },
-        { id: 'acc-mems', name: 'MEMS Accelerometer', abbr: 'mems', note: 'Classical accelerometer used in IMUs — limited by a resonance around 5 kHz.' },
+        { id: 'dgf-frank', name: 'IEPE Dragonfly®', abbr: 'dgf', note: 'The IEPE Dragonfly® is an industrial grade reference sensor bonded to every gripper design to monitor dataset-level consistency. It is a thin piezoelectrocal sensor (5µm thin with a noise level around 10 nm/m). It can be easely glued to any surface with it\'s flexible body.' },
+        { id: 'dgf-passif', name: 'Passive Dragonfly®', abbr: 'dgfp', note: 'The passive dragonfly outputs charge directly, and have the capability as the IEPE Dragonfly®, but without the protection from electrical interference delivered by the IEPE module.' },
+        { id: 'pzt', name: 'PZT Disk', abbr: 'pzt', note: 'Low-cost bulk PZT; brittle, very low-cost, toxic trace of lead.' },
+        { id: 'acc-mems', name: 'MEMS Accelerometer', abbr: 'mems', note: 'Classical accelerometer used in IMUs, limited by a resonance around 5 kHz.' },
         { id: 'strain-gauge', name: 'Metallic Strain Gauge', abbr: 'stg', note: 'Captures static strain but shows broader confusion among plastic-content classes, very low signal energy output.' },
       ],
     },
@@ -453,13 +453,12 @@
         <span class="detail-rate">${pct}%</span>
         <span class="detail-n">n = ${success}/80 successful placements, ${sensor.gf} grasp/handling failures</span>
       </div>
-      <div class="detail-gripper-label">${groupData.label} — ${groupData.desc}</div>
+      ${sensor.note ? `<div class="detail-gripper-label">${sensor.note}</div>` : ''}
       <div class="detail-left-col">
         <h4 class="detail-block-title">Gripper photo</h4>
         <div class="detail-photo-wrap">
           <img id="detailPhoto" src="${photo}" alt="Photo of ${groupData.label} with the ${sensor.name} highlighted" loading="lazy">
         </div>
-        ${sensor.note ? `<p class="detail-note">${sensor.note}</p>` : ''}
       </div>
       <div class="detail-side">
         <div class="detail-side-block">
@@ -473,6 +472,7 @@
           <img id="detailConfmat" src="${confmatSrc(sensor.confmat)}" alt="Confusion matrix for ${sensor.name}">
         </div>
       </div>
+      <p class="detail-note detail-gripper-desc">${groupData.label} — ${groupData.desc}</p>
     `;
     syncConfmatHeight();
   }

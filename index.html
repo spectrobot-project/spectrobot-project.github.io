@@ -154,7 +154,7 @@
   <section class="section" id="benchmark">
     <div class="section-inner">
       <h2><span class="kicker"></span> Sensor &amp; Acquisition Benchmark</h2>
-      <p class="lede">A lot of sensors have comparable results and work very well on the spectrobot framework. Results are comparable and stay around 80% execpt for the no spectrogram rollout and the cell force and strain gauge. We only trained wiyth 40 episodes, and the main failure mode where when the robots failed to shake properly the box and give itself the good signal to analyse.</p>
+      <p class="lede">A lot of sensors have comparable results and work very well on the spectrobot framework. We only trained with only 40 episodes on purpose, the main failure mode being where when the robots failed to shake properly the box and give itself good signals to analyse.</p>
 
       <div class="bench-switch" id="benchSwitch" role="tablist" aria-label="Acquisition bench">
         <button class="bench-btn is-active" data-bench="opendaq" role="tab" aria-selected="true">
@@ -317,10 +317,8 @@
         <pre id="bibtex"><code>@misc{rigal2026spectrobot,
   title         = {SpectRobot: Learning tactile perception from high-bandwidth single-point sensing},
   author        = {Rigal, Joseph and Virot, Emmanuel and Pascal, Caroline},
+  journal={arXiv preprint arXiv:2609.24621},
   year          = {2026},
-  eprint        = {2609.24621},
-  archivePrefix = {arXiv},
-  primaryClass  = {cs.RO},
   url           = {https://arxiv.org/abs/2609.24621}
 }</code></pre>
       </div>
