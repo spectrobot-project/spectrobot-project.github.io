@@ -545,9 +545,6 @@
     lightboxImg.alt = alt || '';
     lightbox.hidden = false;
   }
-  document.getElementById('openFig2')?.addEventListener('click', () => {
-    openLightbox('assets/img/figure2-results-overview.webp', 'Figure 2: full sensor benchmark results with gripper photos, success rates and confusion matrices');
-  });
   document.getElementById('lightboxClose')?.addEventListener('click', () => { lightbox.hidden = true; });
   lightbox?.addEventListener('click', e => { if (e.target === lightbox) lightbox.hidden = true; });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && !lightbox.hidden) lightbox.hidden = true; });
