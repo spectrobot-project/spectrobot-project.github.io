@@ -164,9 +164,9 @@
       label: 'Gripper A',
       desc: 'First gripper carrying an IEPE Dragonfly® strain sensor and an IEPE accelerometer, mounted on the upper jaw, high-end sensors to test the performance of the spectrobot pipeline.',
       sensors: [
-        { id: 'dgf-acc', name: 'IEPE Dragonfly®', abbr: 'dgf', note: 'Industrial grade reference sensor bonded to every gripper design to monitor dataset-level consistency.' },
-        { id: 'acc', name: 'IEPE Accelerometer', abbr: 'acc', note: 'Industrial grade piezo accelerometer.'  },
-        { id: 'notact', name: 'No Tactile Sensor', abbr: 'none', note: 'Vision-only baseline, we removed the spectrogram of the sensors for the training and inference processes — close to 25% which is the random chance level for 4 classes.' },
+        { id: 'dgf-acc', name: 'IEPE Dragonfly®', abbr: 'dgf', note: 'The IEPE Dragonfly® is an industrial grade reference sensor bonded to every gripper design to monitor dataset-level consistency. It is a thin piezoelectrocal sensor (5µm thin with a noise level around 10 nm/m). It can be easely glued to any surface ( ' },
+        { id: 'acc', name: 'IEPE Accelerometer', abbr: 'acc', note: 'Industrial grade piezo accelerometer from PCB piezo.'  },
+        { id: 'notact', name: 'No Tactile Sensor', abbr: 'none', note: 'Vision-only baseline, we removed the spectrogram of the sensors for the training and inference processes.It remains close to 25% which is the random chance level for 4 classes.' },
       ],
     },
     b: {
@@ -201,6 +201,18 @@
     ],
   };
 
+  const SPECTRO = {
+    tiltAbbr: true, // long setting labels are drawn at an angle so they don't overlap
+    label: 'Spectrogram settings (Gripper A, IEPE Dragonfly®)',
+    desc: 'Same Gripper A and IEPE Dragonfly® sensor on the IOLITE®-X · openDAQ™ bench, varying only the spectrogram input: FFT window length (nFFT) and frequency bandwidth.',
+    sensors: [
+      { id: 'dgf-nfft64', name: 'IEPE Dragonfly® — Time window: 0.36s, 0–10 kHz', abbr: '0.36s 10kHz', photo: sensorPhoto('dgf-acc') },
+      { id: 'dgf-acc', name: 'IEPE Dragonfly® — Time window: 2.9s, 0–10 kHz', abbr: '2.9s 10kHz', note: 'Default setting used for every other benchmark result.' },
+      { id: 'dgf-100k-512', name: 'IEPE Dragonfly® — Time window: 0.29s, 0–100 kHz', abbr: '0.29s 100k', photo: sensorPhoto('dgf-acc') },
+      { id: 'dgf-100k-4096', name: 'IEPE Dragonfly® — Time window: 2.3s, 0–100 kHz', abbr: '2.3s 100k', photo: sensorPhoto('dgf-acc') },
+    ],
+  };
+
   // Raw episodes (js/results.js): episodes 0-19 Empty, 20-39 1 Spacer, 40-59 7 Spacers, 60-79 7 Nuts;
   // value = chosen bin 1-4, or 0 / -1 for a grasp/handling failure.
   // seg = [EMPTY, SPACER, 7_SPACERS, 7_NUTS] correct placements out of 20 each; gf = grasp/handling failures out of 80;
@@ -214,7 +226,7 @@
     });
     return { seg: confmat.map((row, i) => row[i]), gf, confmat };
   }
-  [...Object.values(GRIPPERS).flatMap(g => g.sensors), ...TEENSY.sensors].forEach(s => {
+  [...Object.values(GRIPPERS).flatMap(g => g.sensors), ...TEENSY.sensors, ...SPECTRO.sensors].forEach(s => {
     Object.assign(s, computeResults(window.SPECTROBOT_RESULTS[s.id]));
   });
 
@@ -283,6 +295,9 @@
   const SEG_CLASSES = ['seg-empty', 'seg-spacer1', 'seg-spacer7', 'seg-nuts7'];
   const SEG_LABELS = ['Empty', 'Spacer', '7 Spacers', '7 Nuts'];
 
+  // Benches drawn as a single bar group (the openDAQ bench is split into grippers A–C).
+  const SINGLE_BENCHES = { teensy: TEENSY, spectro: SPECTRO };
+
   let currentBench = 'opendaq';
   let currentSelection = { group: 'a', sensorId: 'dgf-acc' };
 
@@ -305,7 +320,8 @@
         barChartEl.appendChild(buildGroup(key, group.label, group.sensors, i === 0));
       });
     } else {
-      barChartEl.appendChild(buildGroup('teensy', TEENSY.label, TEENSY.sensors, true));
+      const group = SINGLE_BENCHES[currentBench];
+      barChartEl.appendChild(buildGroup(currentBench, group.label, group.sensors, true, group.tiltAbbr));
     }
   }
 
@@ -319,9 +335,10 @@
     return { lower: Math.max(0, center - margin), upper: Math.min(1, center + margin) };
   }
 
-  function buildGroup(groupKey, label, sensors, showAxis) {
+  function buildGroup(groupKey, label, sensors, showAxis, tiltAbbr = false) {
     const wrap = document.createElement('div');
     wrap.className = 'bar-group';
+    if (tiltAbbr) wrap.classList.add('tilt-abbr');
 
     const bars = document.createElement('div');
     bars.className = 'bar-group-bars';
@@ -421,7 +438,7 @@
   }
 
   function renderDetail() {
-    const groupData = currentBench === 'opendaq' ? GRIPPERS[currentSelection.group] : TEENSY;
+    const groupData = currentBench === 'opendaq' ? GRIPPERS[currentSelection.group] : SINGLE_BENCHES[currentBench];
     if (!groupData) return;
     const sensor = groupData.sensors.find(s => s.id === currentSelection.sensorId) || groupData.sensors[0];
     if (!sensor) { detailPanel.innerHTML = ''; return; }
@@ -511,7 +528,7 @@
     if (currentBench === 'opendaq') {
       currentSelection = { group: 'a', sensorId: 'dgf-acc' };
     } else {
-      currentSelection = { group: 'teensy', sensorId: 'dgf-frank-cheap' };
+      currentSelection = { group: currentBench, sensorId: SINGLE_BENCHES[currentBench].sensors[0].id };
     }
     renderChart();
     selectSensor(currentSelection.group, currentSelection.sensorId);

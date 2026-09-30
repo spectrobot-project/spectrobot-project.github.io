@@ -319,6 +319,8 @@ h2{ font-size:1.9rem; }
   font-size:.66rem; color:var(--muted); white-space:nowrap;
 }
 .bar-group-label{ margin-top:1.6em; font-size:.8rem; color:var(--text); font-weight:600; text-align:center; }
+.tilt-abbr .bar-abbr{ left:auto; right:50%; transform:translateX(2em) rotate(-15deg); transform-origin:right top; }
+.tilt-abbr .bar-group-label{ margin-top:4.4em; }
 
 /* sequential palette for box-type stacking, shared across all bars */
 .seg-empty{ background:#c7d9fb; }

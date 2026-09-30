@@ -20,7 +20,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=202609281200">
+<link rel="stylesheet" href="css/style.css?v=202609291300">
 </head>
 <body>
 
@@ -39,7 +39,6 @@
       <a href="#attention">Attention</a>
       <!-- <a href="#future">Future Work</a> -->
       <a href="#contact">Contact</a>
-      <a href="#citation">Cite</a>
     </nav>
   </div>
 </header>
@@ -155,19 +154,23 @@
   <section class="section" id="benchmark">
     <div class="section-inner">
       <h2><span class="kicker"></span> Sensor &amp; Acquisition Benchmark</h2>
-      <p class="lede">Seven sensing technologies, spanning acceleration, force and strain, were evaluated on three gripper designs, each instrumented on the upper jaw, away from direct contact.</p>
+      <p class="lede">A lot of sensors have comparable results and work very well on the spectrobot framework. Results are comparable and stay around 80% execpt for the no spectrogram rollout and the cell force and strain gauge. We only trained wiyth 40 episodes, and the main failure mode where when the robots failed to shake properly the box and give itself the good signal to analyse.</p>
 
       <div class="bench-switch" id="benchSwitch" role="tablist" aria-label="Acquisition bench">
         <button class="bench-btn is-active" data-bench="opendaq" role="tab" aria-selected="true">
-          <strong>IOLITE®-X · openDAQ™ bench</strong>
+          <strong>IOLITE®-X · openDAQ™</strong>
           <span>Dewesoft IOLITE®-X · openDAQ™ · 24-bit, up to 100 kHz</span>
         </button>
         <button class="bench-btn" data-bench="teensy" role="tab" aria-selected="false">
-          <strong>Low-cost bench</strong>
-          <span>Teensy 4.1 · ADS8688 bench</span>
+          <strong>Low-cost ADC</strong>
+          <span>Teensy 4.1 · ADS8688</span>
+        </button>
+        <button class="bench-btn" data-bench="spectro" role="tab" aria-selected="false">
+          <strong>Spectrogram settings</strong>
+          <span>IEPE Dragonfly® · nFFT &amp; bandwidth sweep</span>
         </button>
       </div>
-      <p class="fig-note">IOLITE®-X · openDAQ™ is an expensive, high-end industrial/lab-grade acquisition system, while the Teensy 4.1 · ADS8688 bench is an open-source, off-the-shelf alternative built for roughly €100.</p>
+      <p class="fig-note">IOLITE®-X · openDAQ™ is an expensive, high-end industrial-grade acquisition system, while the Teensy 4.1 · ADS8688 bench is an open-source, off-the-shelf alternative bought online.</p>
 
       <div class="bench-links" id="benchLinks">
         <a id="datasetLink" href="#" target="_blank" rel="noopener">Dataset ↗</a>
@@ -177,7 +180,6 @@
       <div class="chart-wrap">
         <div class="chart-legend-row">
           <div class="chart-legend" id="chartLegend"></div>
-          <button class="link-btn" id="openFig2">View full published figure (Fig. 2) ↗</button>
         </div>
         <div class="bar-chart" id="barChart" aria-hidden="false"></div>
       </div>
@@ -190,7 +192,8 @@
   <section class="section section-alt" id="attention">
     <div class="section-inner">
       <h2><span class="kicker"></span> Attention Analysis</h2>
-      <p class="lede">Trained ACT models were analyzed with <strong>Emboviz</strong>, a LeRobot visualization framework, using two diagnostics: <strong>attention</strong> (internal weights during the forward pass) and <strong>scene sensitivity</strong> (how the output changes when regions of the input are occluded). Overlays are shown frame by frame on one full episode per box class.</p>
+      <p class="lede">Trained ACT models were analyzed with <strong>Emboviz</strong>, a LeRobot visualization framework, using two diagnostics: <strong>attention</strong> (internal weights during the forward pass) .</p>
+      <p class="lede">You can observe the <strong>shaking pattern</strong> on the spectrogram around 11 to 14 seconds in the video, attention concentrate during this shaking periode around 4 to 6kHz.</p>
 
 
       <div class="attn-controls">
@@ -337,8 +340,8 @@
   <img id="lightboxImg" src="" alt="">
 </div>
 
-<script src="js/results.js?v=202609241636"></script>
-<script src="js/app.js?v=202609241636"></script>
+<script src="js/results.js?v=202609291300"></script>
+<script src="js/app.js?v=202609291300"></script>
 <script>
   document.getElementById("bibtexCopy").addEventListener("click", function () {
     var btn = this;

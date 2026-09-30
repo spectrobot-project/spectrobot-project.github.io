@@ -25,21 +25,21 @@ window.SPECTROBOT_RESULTS = {
     3, 2, 2, 3, 4, 4, 2, 2, 3, 3, 3, 3, 3, 3, 2, 0, 2, 0, 4, 2,
     2, 2, 1, 2, 4, 0, 0, 4, 2, 3, 3, 4, 4, 2, 2, 2, 3, 3, 4, 4
   ],
-  // Gripper A — IEPE Dragonfly, 0-10 kHz, nfft 64 (not shown on the site)
+  // Gripper A — IEPE Dragonfly, 0-10 kHz, nfft 64 (spectrogram-settings tab)
   'dgf-nfft64': [
     4, 4, 3, 4, 3, 0, 0, 4, 2, 3, 4, 3, 2, 4, 4, 4, 4, 0, 0, 4,
     4, 4, 4, 4, 4, 0, 4, 4, 4, 4, 0, -1, 0, 0, 4, 4, 0, 4, 4, 4,
     3, 3, 4, 3, 4, 4, 2, 2, 3, 4, 0, 0, -1, 3, 4, 3, 0, 4, 3, 4,
     3, 4, -1, -1, 4, 0, 4, 4, 4, 0, 4, 4, 4, 4, 3, 4, 0, 4, 0, 4
   ],
-  // Gripper A — IEPE Dragonfly, 0-100 kHz, nfft 512 (not shown on the site)
+  // Gripper A — IEPE Dragonfly, 0-100 kHz, nfft 512 (spectrogram-settings tab)
   'dgf-100k-512': [
     2, 2, 0, 2, 3, 2, 3, 3, 0, 3, 3, 3, 2, 3, 0, 3, 2, 2, 3, 3,
     3, 3, 4, 0, 4, 4, 4, 0, 0, 0, 3, 2, 2, 0, 2, 2, 0, 2, 2, 3,
     3, 2, -1, 4, 0, 0, 3, 3, 0, 4, 2, 0, 3, 3, 2, 3, -1, 3, 3, 3,
     3, 3, 4, 4, 4, 3, 0, 0, 2, 3, 0, 0, 3, 3, 0, 3, 3, -1, 3, 3
   ],
-  // Gripper A — IEPE Dragonfly, 0-100 kHz, nfft 4096 (not shown on the site)
+  // Gripper A — IEPE Dragonfly, 0-100 kHz, nfft 4096 (spectrogram-settings tab)
   'dgf-100k-4096': [
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1,
     1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 2, 2, 2, 2,
