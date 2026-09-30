@@ -22,7 +22,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=20260930-equal-heights-300">
+<link rel="stylesheet" href="css/style.css?v=20261001-text-size">
 </head>
 <body>
 
@@ -38,7 +38,7 @@
       <a href="#abstract">Abstract</a>
       <a href="#results">Results</a>
       <a href="#benchmark">Benchmark</a>
-      <a href="#attention">Attention</a>
+      <a href="#attention">Attention maps</a>
       <a href="#contact">Contact</a>
     </nav>
   </div>
@@ -52,7 +52,7 @@
       <div class="hero-copy">
         <h1>SpectRobot</h1>
         <p class="tagline">Learning tactile perception<br>from high-bandwidth single-point sensing</p>
-        <p class="authors">Joseph Rigal<sup>1</sup>, Emmanuel Virot<sup>1,*</sup>, Caroline Pascal<sup>2</sup></p>
+        <p class="authors"><a href="https://www.linkedin.com/in/joseph-rigal-8299192a1/" target="_blank" rel="noopener">Joseph Rigal</a><sup>1</sup>, <a href="https://www.linkedin.com/in/emmanuelvirot/" target="_blank" rel="noopener">Emmanuel Virot</a><sup>1,*</sup>, <a href="https://www.linkedin.com/in/carolinepascal/" target="_blank" rel="noopener">Caroline Pascal</a><sup>2</sup></p>
         <p class="affiliations"><sup>1</sup> Wormsensing, France · <sup>2</sup> Hugging Face, France · <sup>*</sup>Corresponding author</p>
         <div class="cta-row">
           <a class="btn btn-primary" href="https://arxiv.org/abs/2609.24621" target="_blank" rel="noopener">
@@ -100,7 +100,7 @@
   <section class="section section-alt" id="results">
     <div class="section-inner">
       <h2><span class="kicker"></span> Tactile sorting under visual occlusion</h2>
-      <p class="lede">The robot picks up an opaque box, gently shakes it, and must infer one of four visually indistinguishable contents from vision <em>and</em> tactile spectrogram before placing the box in the corresponding bin.</p>
+      <p class="lede">The robot picks up an opaque box, gently shakes it, and must infer one of four visually indistinguishable contents from vision and <strong>tactile spectrogram</strong> before placing the box in the corresponding bin.</p>
 
       <div class="box-switch" id="boxSwitch" role="tablist" aria-label="Box content">
         <button class="box-btn is-active" data-box="empty" role="tab" aria-selected="true">
@@ -157,8 +157,8 @@
   <!-- BENCHMARK -->
   <section class="section" id="benchmark">
     <div class="section-inner">
-      <h2><span class="kicker"></span> Sensor &amp; acquisition benchmark</h2>
-      <p class="lede">Many sensors in our benchmark achieve comparable results and perform very well on the SpectRobot framework. We intentionally limited training to just 40 episodes to accentuate differences in performance. The main failure mode occurred when the robot did not shake the box effectively enough, resulting in weaker signals for analysis.</p>
+      <h2><span class="kicker"></span> Sensor &amp; acquisition system benchmark</h2>
+      <p class="lede">Many sensors in our benchmark achieve comparable results and perform very well on the SpectRobot framework. We intentionally limited the training dataset to just 40 episodes to accentuate differences in performance. The main failure mode occurred when the robot did not shake the box effectively enough, resulting in weaker signals for analysis.</p>
 
       <div class="bench-switch" id="benchSwitch" role="tablist" aria-label="Acquisition bench">
         <button class="bench-btn is-active" data-bench="opendaq" role="tab" aria-selected="true">
@@ -195,7 +195,7 @@
   <!-- ATTENTION -->
   <section class="section section-alt" id="attention">
     <div class="section-inner">
-      <h2><span class="kicker"></span> Attention analysis</h2>
+      <h2><span class="kicker"></span> Attention maps</h2>
         <p class="lede">The trained ACT models were analyzed with Emboviz (<a href="https://github.com/Ashok93/emboviz" target="_blank" rel="noopener">GitHub</a>), focusing on internal attention weights computed during the forward pass. A clear pattern can be observed in the spectrogram between approximately 11 and 14 seconds in the video. During this period, the model's attention becomes concentrated primarily in the 4 to 6 kHz frequency range.</p>
 
       <div class="attn-controls">
@@ -303,7 +303,7 @@
 </div>
 
 <script src="js/results.js?v=202609291300"></script>
-<script src="js/app.js?v=20261001-tilted-labels"></script>
+<script src="js/app.js?v=20261001-chart-player-fixes"></script>
 <script>
   document.getElementById("bibtexCopy").addEventListener("click", function () {
     var btn = this;

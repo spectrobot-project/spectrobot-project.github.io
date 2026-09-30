@@ -439,6 +439,8 @@
       errBar.style.height = `${(upper - lower) * BAR_SCALE_PX}px`;
       const errDot = document.createElement('span');
       errDot.className = 'error-bar-dot';
+      // Measure down from the upper confidence limit to the observed rate.
+      errDot.style.top = `${(upper - success / 80) * BAR_SCALE_PX}px`;
       errBar.appendChild(errDot);
       outer.appendChild(errBar);
 

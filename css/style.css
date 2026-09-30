@@ -145,7 +145,7 @@ a{color:var(--navy);}
   font-size:.75rem; color:var(--amber); margin-bottom:.4em;
 }
 h2{ font-size:1.9rem; }
-.lede{ max-width:52em; color:var(--muted); font-size:1.02rem; }
+.lede{ max-width:52em; color:var(--muted); font-size:1rem; }
 .fig-note{ color:var(--muted); font-size:.85rem; margin-top:.6em; }
 
 /* ---------- CITATION ---------- */
@@ -237,7 +237,7 @@ h2{ font-size:1.9rem; }
 /* round drag handle at the end of the played bar */
 .video-progress-played::after{
   content:""; position:absolute; right:-8px; top:-7px; width:16px; height:16px; margin:0;
-  border-radius:50%; background:var(--maxw); border:2px solid var(--navy-dark);
+  border-radius:50%; background:var(--navy); border:2px solid var(--navy-dark);
   box-shadow:0 1px 4px rgba(0,0,0,.35); transition:transform .12s ease;
 }
 .video-progress:hover .video-progress-played::after,
@@ -343,8 +343,8 @@ h2{ font-size:1.9rem; }
 .detail-header{ grid-column:1 / -1; display:flex; align-items:baseline; gap:.8em; flex-wrap:wrap; }
 .detail-header h3{ font-size:1.15rem; margin:0; }
 .detail-rate{ font-size:1.5rem; font-weight:800; color:var(--navy); font-family:"Source Serif 4",serif; }
-.detail-n{ color:var(--muted); font-size:.82rem; }
-.detail-gripper-label{ color:var(--muted); font-size:.85rem; margin:.1em 0 1.2em; grid-column:1/-1; }
+.detail-n{ color:var(--muted); font-size:1rem; }
+.detail-gripper-label{ color:var(--muted); font-size:1rem; max-width:52em; margin:.1em 0 1.2em; grid-column:1/-1; }
 
 .detail-block-title{
   font-family:"Inter",sans-serif; font-size:.72rem; text-transform:uppercase; letter-spacing:.08em;
@@ -378,7 +378,7 @@ h2{ font-size:1.9rem; }
 .detail-side{ display:flex; flex-direction:column; gap:1.2em; }
 .detail-side-block img{ border-radius:8px; border:1px solid var(--border); max-width:100%; }
 #detailConfmat{ display:block; height:var(--detail-image-height); width:auto; max-width:100%; object-fit:contain; margin:0; }
-.detail-note{ font-size:.87rem; color:var(--muted); margin:0; }
+.detail-note{ font-size:1rem; max-width:52em; color:var(--muted); margin:0; }
 
 .detail-confmat-caption{
   position:absolute; bottom:calc(100% + 10px); left:50%; transform:translateX(-50%);
