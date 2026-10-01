@@ -287,6 +287,9 @@
   // Val (rollout) dataset and policy model repos, from table_dataset.txt — the exact HF repos behind each bar.
   const LINKS = {
     'dgf-acc': { dataset: 'rollout_2026-08-04_shake4it_bench_dragonfly_10kHz_nfft_512_big_20260804_112531', model: 'policy_2026-07-28_shake4it_bench_dragonfly_10kHz_nfft_512' },
+    'dgf-nfft64': { dataset: 'rollout_2026-08-05_shake4it_bench_dragonfly_10kHz_nfft_64_big_20260805_151856', model: 'policy_2026-07-28_shake4it_bench_dragonfly_10kHz_nfft_64' },
+    'dgf-100k-512': { dataset: 'rollout_2026-08-05_shake4it_bench_dragonfly_100kHz_nfft_512_big_20260805_162516', model: 'policy_2026-07-28_shake4it_bench_dragonfly_100kHz_nfft_512' },
+    'dgf-100k-4096': { dataset: 'rollout_2026-08-05_shake4it_bench_dragonfly_100kHz_nfft_4096_big_20260806_092142', model: 'policy_2026-07-28_shake4it_bench_dragonfly_100kHz_nfft_4096' },
     'acc': { dataset: 'rollout_2026-08-04_shake4it_bench_accelero_10kHz_nfft_512_big_20260804_105115', model: 'policy_2026-08-03_shake4it_bench_accelero_10kHz_nfft_512' },
     'notact': { dataset: 'rollout_2026-08-04_shake4it_bench_notact_20260804_143759', model: 'policy_2026-08-03_shake4it_bench_notact' },
     'loadcell': { dataset: 'rollout_2026-08-06_shake4it_bench_dlc_load_cell_10kHz_nfft_512_big_20260807_142722', model: 'policy_2026-08-06_shake4it_bench_dlc_load_cell_10kHz_nfft_512' },
